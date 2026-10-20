@@ -1,0 +1,13 @@
+Bin_ID,Location,Distance_cm,Fill_Level_%,Fill_Rate_%/h,Temp_C,Battery_%,Complaints,Status,Need_Pickup
+DB-001,Main Bus Terminal,3.2,89.3,4.8,34.2,94,2,Critical,YES (1)
+DB-002,Municipal Market,1.8,94.0,5.2,35.1,91,3,Overflow,YES (1)
+DB-003,Central Hospital Gate,6.0,80.0,3.6,31.0,98,1,Critical,YES (1)
+DB-004,Govt Primary School,18.5,38.3,1.4,29.5,96,0,Normal,NO (0)
+DB-005,Railway Station Plaza,4.5,85.0,4.1,33.8,88,2,Critical,YES (1)
+DB-006,Town Hall Square,12.0,60.0,2.2,30.1,95,0,Moderate,NO (0)
+DB-007,Community Park North,22.4,25.3,0.9,28.4,97,0,Normal,NO (0)
+DB-008,Vegetable Mandi Rd,0.9,97.0,6.1,36.4,85,4,Overflow,YES (1)
+DB-009,Residential Sector 4,15.6,48.0,1.8,29.0,93,0,Normal,NO (0)
+DB-010,Commercial Complex,7.2,76.0,3.4,32.5,90,1,Moderate,YES (1)
+DB-011,Panchayat Office,26.1,13.0,0.6,27.8,99,0,Normal,NO (0)
+DB-012,Temple Street South,5.1,83.0,3.9,33.0,92,1,Critical,YES (1)

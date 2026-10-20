@@ -1,0 +1,16 @@
+{
+  "model_name": "EcoRoute_Dustbin_Overflow_Predictor_v1",
+  "algorithm": "Multivariate Linear & Random Forest Time-Series Estimator",
+  "trained_at": "2026-10-02T14:56:38.990394",
+  "training_samples": 600,
+  "metrics": {
+    "mae_hours": 4.33,
+    "r2_score": 0.912,
+    "accuracy_percent": 91.2
+  },
+  "weights": {
+    "bias": 14.85,
+    "weight_current_fill": -0.145,
+    "weight_rate_per_hour": -0.62
+  }
+}

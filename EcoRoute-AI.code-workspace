@@ -1,0 +1,32 @@
+{
+  "folders": [
+    {
+      "name": "EcoRoute AI - Smart Waste Management",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "explorer.compactFolders": false,
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "bradlc.vscode-tailwindcss",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "ms-python.python",
+      "ms-toolsai.jupyter"
+    ]
+  }
+}

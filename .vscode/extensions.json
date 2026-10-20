@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "ms-python.python",
+    "ms-toolsai.jupyter",
+    "rangav.vscode-thunder-client",
+    "vsciot-vscode.vscode-arduino",
+    "platformio.platformio-ide"
+  ]
+}

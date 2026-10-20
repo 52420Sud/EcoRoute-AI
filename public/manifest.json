@@ -1,0 +1,60 @@
+{
+  "name": "EcoRoute AI - Smart Waste Management System",
+  "short_name": "EcoRoute",
+  "description": "AI-powered Smart Waste Management System with IoT Sensors, Citizen Portal, and Optimized Collection Routes",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "categories": ["utilities", "productivity", "navigation"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Report Dustbin",
+      "short_name": "Report",
+      "description": "Report an overflowing dustbin with photo & GPS",
+      "url": "/?tab=report",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Authority Dashboard",
+      "short_name": "Authority",
+      "description": "City Operations Command Center",
+      "url": "/?tab=authority",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Driver Navigation",
+      "short_name": "Driver",
+      "description": "Optimized Collection Route & Turn-by-Turn GPS",
+      "url": "/?tab=driver",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

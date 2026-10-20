@@ -7,11 +7,11 @@ Write-Host "=========================================================="
 Write-Host "EcoRoute AI - Automated Flutter SDK Installer"
 Write-Host "=========================================================="
 
-$targetParent = "C:\src"
-$installDir = "C:\src\flutter"
-$binDir = "C:\src\flutter\bin"
-$zipFile = "C:\src\flutter_windows.zip"
-$flutterUrl = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.47.7-stable.zip"
+$targetParent = "D:\src"
+$installDir = "D:\src\flutter"
+$binDir = "D:\src\flutter\bin"
+$zipFile = "D:\src\flutter_windows.zip"
+$flutterUrl = "https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.29.0-stable.zip"
 
 # 1. Ensure target parent folder exists
 if (-not (Test-Path $targetParent)) {

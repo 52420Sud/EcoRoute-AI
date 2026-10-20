@@ -53,8 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
               style: const TextStyle(color: Colors.white, fontSize: 13),
               decoration: const InputDecoration(
                 labelText: 'Backend Base URL',
-                hintText: 'http://10.241.198.76:5000/api',
-                prefixIcon: Icon(Icons.link, color: AppTheme.emerald),
+                hintText: ApiConstants.productionBaseUrl,
+                prefixIcon: Icon(Icons.cloud_done, color: AppTheme.emerald),
               ),
             ),
             const SizedBox(height: 12),
@@ -62,16 +62,22 @@ class _HomeScreenState extends State<HomeScreen> {
               spacing: 6,
               children: [
                 ActionChip(
-                  label: const Text('Localhost', style: TextStyle(fontSize: 10)),
-                  onPressed: () => controller.text = 'http://localhost:5000/api',
+                  avatar: const Icon(Icons.cloud, size: 14, color: AppTheme.emerald),
+                  label: const Text('Live Cloud (Render)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                  backgroundColor: AppTheme.emerald.withOpacity(0.3),
+                  onPressed: () => controller.text = ApiConstants.productionBaseUrl,
+                ),
+                ActionChip(
+                  label: const Text('Local Wi-Fi / ESP32', style: TextStyle(fontSize: 10)),
+                  onPressed: () => controller.text = 'http://10.24.177.25:5000/api',
+                ),
+                ActionChip(
+                  label: const Text('Localhost (5000)', style: TextStyle(fontSize: 10)),
+                  onPressed: () => controller.text = ApiConstants.localhostBaseUrl,
                 ),
                 ActionChip(
                   label: const Text('Android Emul (10.0.2.2)', style: TextStyle(fontSize: 10)),
-                  onPressed: () => controller.text = 'http://10.0.2.2:5000/api',
-                ),
-                ActionChip(
-                  label: const Text('LAN IP (10.241.198.76)', style: TextStyle(fontSize: 10)),
-                  onPressed: () => controller.text = 'http://10.241.198.76:5000/api',
+                  onPressed: () => controller.text = ApiConstants.emulatorBaseUrl,
                 ),
               ],
             ),

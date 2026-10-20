@@ -1,9 +1,11 @@
 class ApiConstants {
-  // Update this to your computer's local Wi-Fi IP or Cloud backend URL
-  // e.g., 'http://10.241.198.76:5000/api' or 'http://10.0.2.2:5000/api' for Android Emulator
-  static String baseUrl = 'http://10.241.198.76:5000/api';
+  // Production Render Cloud Backend URL (EcoRoute AI Live API)
+  static const String productionBaseUrl = 'https://ecoroute-ai-v4jd.onrender.com/api';
   static const String emulatorBaseUrl = 'http://10.0.2.2:5000/api';
   static const String localhostBaseUrl = 'http://localhost:5000/api';
+
+  // Default to live production URL (never uses localhost in production)
+  static String baseUrl = productionBaseUrl;
 
   // Hardware Calibration
   static const double defaultBinDepthCm = 30.0;

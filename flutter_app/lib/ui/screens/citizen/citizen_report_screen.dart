@@ -441,6 +441,9 @@ class _CitizenReportScreenState extends State<CitizenReportScreen> {
                           controller: _otpController,
                           keyboardType: TextInputType.number,
                           maxLength: 6,
+                          onChanged: (val) {
+                            if (val.length == 6) _verifyOtp();
+                          },
                           style: const TextStyle(
                             color: AppTheme.emerald,
                             letterSpacing: 4,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../data/models/dustbin_model.dart';
 import '../../../providers/waste_provider.dart';
 import '../../widgets/dustbin_card.dart';
 import 'live_map_screen.dart';

@@ -7,11 +7,15 @@ import 'priority_tier_badge.dart';
 class DustbinCard extends StatelessWidget {
   final DustbinModel dustbin;
   final VoidCallback? onTap;
+  final VoidCallback? onCalibrate;
+  final VoidCallback? onCollect;
 
   const DustbinCard({
     Key? key,
     required this.dustbin,
     this.onTap,
+    this.onCalibrate,
+    this.onCollect,
   }) : super(key: key);
 
   @override
@@ -38,7 +42,7 @@ class DustbinCard extends StatelessWidget {
             children: [
               // Top Bar: ID + Tier Badge
               Row(
-                mainAxisAlignment: MainAxisAlignment.between,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
@@ -73,7 +77,7 @@ class DustbinCard extends StatelessWidget {
 
               // Fill Level Bar
               Row(
-                mainAxisAlignment: MainAxisAlignment.between,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Fill Level: ${dustbin.fillLevel}%',
@@ -121,7 +125,7 @@ class DustbinCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   OutlinedButton.icon(
-                    onPressed: () async {
+                    onPressed: onCalibrate ?? () async {
                       final ok = await provider.calibrateDepth(dustbin.id);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -145,7 +149,7 @@ class DustbinCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton.icon(
-                    onPressed: () => provider.markStopCollected(dustbin.id),
+                    onPressed: onCollect ?? () => provider.markStopCollected(dustbin.id),
                     icon: const Icon(Icons.check_rounded, size: 14),
                     label: const Text('Collect', style: TextStyle(fontSize: 11)),
                     style: ElevatedButton.styleFrom(

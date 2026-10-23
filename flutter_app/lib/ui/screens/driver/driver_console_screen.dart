@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../data/models/route_plan_model.dart';
 import '../../../providers/waste_provider.dart';
 import '../../widgets/priority_tier_badge.dart';
 

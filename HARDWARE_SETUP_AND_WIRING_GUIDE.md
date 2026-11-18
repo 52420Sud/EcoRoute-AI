@@ -34,11 +34,10 @@ Connect the components to your **ESP32 DevKit V1** as shown in your circuit diag
 | **Status LED (D1)** | **Anode (+)** | **GPIO 27 (IO27)** | **R3 (130 Ω)** | Visual indicator for Wi-Fi, telemetry transmission & alerts |
 | **Status LED (D1)** | **Cathode (-)** | **GND_R** | *None* | Ground connection |
 
-> 💡 **Why use the 4.7 kΩ and 3.3 kΩ Voltage Divider?**  
-> The HC-SR04 sensor outputs a 5V logic pulse on its ECHO pin. The ESP32 GPIO inputs are rated for 3.3V logic.  
-> Connecting **GPIO 14** between **R2 (4.7 kΩ)** and **R1 (3.3 kΩ)** steps down the voltage:  
-> $$V_{\text{ESP32}} = 5\text{V} \times \frac{3.3\text{k}\Omega}{3.3\text{k}\Omega + 4.7\text{k}\Omega} \approx 2.06\text{V} - 3.3\text{V}$$  
-> This safely triggers a clean digital HIGH on the ESP32 while guaranteeing complete overvoltage protection.
+> 💡 **Voltage Divider Note for ESP32:**  
+> The HC-SR04 sensor outputs a 5V logic pulse on its ECHO pin, while ESP32 GPIO inputs are 3.3V logic.  
+> - **If using 4.7kΩ and 3.3kΩ:** The divided voltage ($2.06\text{V}$) can sometimes sit right on the borderline of the ESP32 input HIGH threshold ($V_{IH} \approx 2.47\text{V}$).  
+> - **Quick Fix if readings are timing out / not detected:** Connect HC-SR04 **ECHO directly to GPIO 14** (or through a single $1\text{k}\Omega$ series resistor). In practice, ESP32 GPIOs have internal ESD clamping diodes that handle the low-current 5V pulse safely during testing.
 
 ---
 
@@ -118,7 +117,7 @@ Connect the components to your **ESP32 DevKit V1** as shown in your circuit diag
    const char* WIFI_SSID     = "Your_WiFi_Hotspot_Name";
    const char* WIFI_PASSWORD = "Your_WiFi_Password";
    // Set to your computer's Wi-Fi IP address:
-   const char* SERVER_URL    = "http://10.50.80.76:5000/api/sensors/telemetry";
+   const char* SERVER_URL    = "http://10.255.74.76:5000/api/sensors/telemetry";
    ```
 6. Under **Tools** menu:
    - Select Board: **"ESP32 Dev Module"**

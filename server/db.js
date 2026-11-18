@@ -96,6 +96,12 @@ export function initDatabase() {
       status TEXT NOT NULL DEFAULT 'Available',
       assigned_route_id TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS system_config (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
   `);
 
   // Check if we need to seed initial data

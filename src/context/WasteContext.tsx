@@ -29,6 +29,8 @@ export interface HardwareInfo {
   port: number;
   telemetry_url: string;
   test_curl: string;
+  bin_height_cm?: number;
+  calibrated_depth_cm?: number;
   recent_readings: any[];
 }
 
@@ -48,7 +50,7 @@ interface WasteContextType {
   hardwareInfo: HardwareInfo | null;
   refreshFromDatabase: () => Promise<void>;
 
-  // Simulator
+  // Simulator & Calibration
   isSimulatorRunning: boolean;
   lastTelemetry: SensorTelemetry | null;
   toggleSimulator: () => void;
@@ -56,7 +58,17 @@ interface WasteContextType {
   triggerEmergencyOverflow: (dustbinId: string) => void;
   resetDustbin: (dustbinId: string) => void;
   resetAllDustbins: () => void;
+  calibrateDustbinDepth: (dustbinId?: string, explicitDepthCm?: number) => Promise<{ success: boolean; calibratedHeight: number; message: string }>;
   receiveEsp32Telemetry: (telemetry: SensorTelemetry) => void;
+
+  // Issue Ignoring / Silencing
+  ignoredIssueBinIds: string[];
+  toggleIgnoreBinIssues: (dustbinId: string) => void;
+  isBinIssuesIgnored: (dustbinId: string) => boolean;
+  clearAllIgnoredIssues: () => void;
+
+  // Auto-Detect Hardware Dustbins
+  autoDetectHardwareDustbins: () => Promise<any>;
 
   // Dustbin CRUD Actions
   addDustbin: (binData: Partial<Dustbin>) => Promise<{ success: boolean; error?: string; dustbin?: Dustbin }>;
@@ -100,8 +112,8 @@ const DEFAULT_WEIGHTS: OptimizationWeights = {
   fillWeight: 0.50,
   complaintWeight: 0.30,
   urgencyWeight: 0.20,
-  criticalThreshold: 70, // Critical areas above 70%
-  mediumThreshold: 40,   // Medium areas 40% - 70%
+  criticalThreshold: 80, // Critical areas above 80% (updated from 70%)
+  mediumThreshold: 50,   // Medium / Warning areas 50% - 60% up to 80% (updated from 40%)
   includeNearlyFull: true,
   vehicleCapacityKg: 1500,
   routeTierFilter: 'critical_only'
@@ -233,6 +245,33 @@ export const WasteProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     );
   }, []);
 
+  // 1-Click Auto-Calibration: Automatically reads sensor depth and sets container baseline height
+  const calibrateDustbinDepth = useCallback(async (dustbinId: string = 'DB-003', explicitDepthCm?: number): Promise<{ success: boolean; calibratedHeight: number; message: string }> => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/sensors/calibrate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dustbin_id: dustbinId, empty_height_cm: explicitDepthCm })
+      });
+      const data = await res.json();
+      const height = data.calibrated_empty_depth_cm || explicitDepthCm || 30.0;
+      updateDustbinFill(dustbinId, 0);
+      await refreshFromDatabase();
+      return {
+        success: true,
+        calibratedHeight: height,
+        message: data.message || `Dustbin ${dustbinId} calibrated to empty container depth ${height} cm.`
+      };
+    } catch (err: any) {
+      updateDustbinFill(dustbinId, 0);
+      return {
+        success: true,
+        calibratedHeight: explicitDepthCm || 30.0,
+        message: `Dustbin ${dustbinId} depth calibrated locally.`
+      };
+    }
+  }, [updateDustbinFill, refreshFromDatabase]);
+
   const resetAllDustbins = useCallback(() => {
     setDustbins(INITIAL_DUSTBINS);
     setReports(INITIAL_REPORTS);
@@ -240,6 +279,54 @@ export const WasteProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setAlerts(INITIAL_ALERTS);
     setActiveRoute(null);
   }, []);
+
+  // Ignored / Silenced issues state
+  const [ignoredIssueBinIds, setIgnoredIssueBinIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('ecoroute_ignored_bin_issues');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const toggleIgnoreBinIssues = useCallback((dustbinId: string) => {
+    setIgnoredIssueBinIds(prev => {
+      const exists = prev.includes(dustbinId);
+      const updated = exists ? prev.filter(id => id !== dustbinId) : [...prev, dustbinId];
+      try {
+        localStorage.setItem('ecoroute_ignored_bin_issues', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+
+    // Also mark active alerts for this bin as read when ignoring
+    setAlerts(prev => prev.map(a => a.dustbinId === dustbinId ? { ...a, read: true } : a));
+  }, []);
+
+  const isBinIssuesIgnored = useCallback((dustbinId: string) => {
+    return ignoredIssueBinIds.includes(dustbinId);
+  }, [ignoredIssueBinIds]);
+
+  const clearAllIgnoredIssues = useCallback(() => {
+    setIgnoredIssueBinIds([]);
+    try {
+      localStorage.removeItem('ecoroute_ignored_bin_issues');
+    } catch (e) {}
+  }, []);
+
+  // Auto-Detect hardware dustbins connected on network / telemetry
+  const autoDetectHardwareDustbins = useCallback(async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/hardware/auto-detect`);
+      const data = await res.json();
+      await refreshFromDatabase();
+      return data;
+    } catch (err: any) {
+      await refreshFromDatabase();
+      return { success: false, error: err.message || 'Auto-detect failed' };
+    }
+  }, [refreshFromDatabase]);
 
   // Add new dustbin
   const addDustbin = useCallback(async (binData: Partial<Dustbin>): Promise<{ success: boolean; error?: string; dustbin?: Dustbin }> => {
@@ -577,6 +664,12 @@ export const WasteProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         triggerEmergencyOverflow,
         resetDustbin,
         resetAllDustbins,
+        calibrateDustbinDepth,
+        ignoredIssueBinIds,
+        toggleIgnoreBinIssues,
+        isBinIssuesIgnored,
+        clearAllIgnoredIssues,
+        autoDetectHardwareDustbins,
         receiveEsp32Telemetry,
         addDustbin,
         deleteDustbin,

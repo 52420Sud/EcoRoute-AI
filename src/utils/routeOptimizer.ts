@@ -16,9 +16,9 @@ export function calculateDustbinPriorityScore(
   const complaintScore = Math.min(100, bin.activeComplaintCount * 35);
   const complaintComponent = complaintScore * weights.complaintWeight;
 
-  // Urgency component (critical fill >= 70% or complaints create high urgency)
-  const critThreshold = weights.criticalThreshold ?? 70;
-  const medThreshold = weights.mediumThreshold ?? 40;
+  // Urgency component (critical fill >= 80% or complaints create high urgency)
+  const critThreshold = weights.criticalThreshold ?? 80;
+  const medThreshold = weights.mediumThreshold ?? 50;
 
   let urgencyBase = 0;
   if (bin.fillLevel >= 90) urgencyBase = 100;
@@ -47,8 +47,8 @@ export function optimizeCollectionRoute(
   depotLocation: LocationCoordinates,
   weights: OptimizationWeights
 ): RoutePlan {
-  const criticalThreshold = weights.criticalThreshold ?? 70;
-  const mediumThreshold = weights.mediumThreshold ?? 40;
+  const criticalThreshold = weights.criticalThreshold ?? 80;
+  const mediumThreshold = weights.mediumThreshold ?? 50;
   const tierFilter: RouteTierFilter = weights.routeTierFilter || 'critical_only';
 
   // Helper: Classify each bin into a strict Priority Tier

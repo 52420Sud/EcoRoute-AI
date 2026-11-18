@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" width="900" height="650" style="background:#ffffff; font-family:'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <linearGradient id="lidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#374151"/>
+      <stop offset="100%" stop-color="#1f2937"/>
+    </linearGradient>
+    <linearGradient id="binGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f3f4f6"/>
+      <stop offset="100%" stop-color="#e5e7eb"/>
+    </linearGradient>
+    <linearGradient id="beamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="wasteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#2563eb"/>
+    </marker>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f1f5f9" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background Grid -->
+  <rect width="900" height="650" fill="#ffffff"/>
+  <rect width="900" height="650" fill="url(#grid)"/>
+
+  <!-- Title Banner -->
+  <rect x="30" y="20" width="840" height="48" rx="8" fill="#1e293b"/>
+  <text x="450" y="50" fill="#f8fafc" font-size="18" font-weight="bold" text-anchor="middle">Figure B.1.1: HC-SR04 Ultrasonic Acoustic Radiation Cone, Blind Zone &amp; Depth Calibration</text>
+
+  <!-- Dustbin Enclosure Cutaway -->
+  <rect x="220" y="110" width="340" height="490" rx="12" fill="url(#binGrad)" stroke="#94a3b8" stroke-width="2.5"/>
+  <rect x="200" y="100" width="380" height="26" rx="6" fill="url(#lidGrad)"/>
+  <text x="390" y="118" fill="#f8fafc" font-size="12" font-weight="600" text-anchor="middle">Municipal Bin Lid Enclosure (Weatherproof IP65 Mount)</text>
+
+  <!-- Sensor Module (HC-SR04) -->
+  <rect x="340" y="126" width="100" height="34" rx="4" fill="#0284c7" stroke="#0369a1" stroke-width="1.5"/>
+  <!-- Transducer Horns -->
+  <circle cx="365" cy="143" r="11" fill="#cbd5e1" stroke="#334155" stroke-width="2"/>
+  <circle cx="365" cy="143" r="5" fill="#64748b"/>
+  <circle cx="415" cy="143" r="11" fill="#cbd5e1" stroke="#334155" stroke-width="2"/>
+  <circle cx="415" cy="143" r="5" fill="#64748b"/>
+  <text x="365" y="132" fill="#0f172a" font-size="9" font-weight="bold" text-anchor="middle">TRIG TX</text>
+  <text x="415" y="132" fill="#0f172a" font-size="9" font-weight="bold" text-anchor="middle">ECHO RX</text>
+
+  <!-- Blind Zone (< 2 cm) -->
+  <rect x="230" y="160" width="320" height="26" fill="#fee2e2" stroke="#ef4444" stroke-dasharray="4,3" stroke-width="1.2"/>
+  <text x="390" y="177" fill="#b91c1c" font-size="11" font-weight="bold" text-anchor="middle">NEAR-FIELD BLIND ZONE (d &lt; 2.0 cm) -> Firmware Clamps to 94%</text>
+
+  <!-- Acoustic Beam Dispersion Cone (15° total angle, 7.5° half angle) -->
+  <polygon points="365,160 255,420 525,420 415,160" fill="url(#beamGrad)" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <path d="M 365 210 A 50 50 0 0 0 415 210" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+  <text x="390" y="235" fill="#1d4ed8" font-size="12" font-weight="bold" text-anchor="middle">2θ = 15° Dispersion Cone</text>
+
+  <!-- Wavefront Arcs -->
+  <path d="M 345 250 A 60 20 0 0 0 435 250" fill="none" stroke="#60a5fa" stroke-width="2"/>
+  <path d="M 325 285 A 90 30 0 0 0 455 285" fill="none" stroke="#60a5fa" stroke-width="2"/>
+  <path d="M 300 325 A 120 40 0 0 0 480 325" fill="none" stroke="#60a5fa" stroke-width="2"/>
+  <path d="M 275 370 A 150 50 0 0 0 505 370" fill="none" stroke="#60a5fa" stroke-width="2"/>
+
+  <!-- Solid Waste Mound Inside Bin -->
+  <path d="M 220 450 Q 280 410, 350 430 T 460 415 T 560 445 L 560 600 L 220 600 Z" fill="url(#wasteGrad)" stroke="#047857" stroke-width="2"/>
+  <text x="390" y="520" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">ACCUMULATED SOLID REFUSE</text>
+  <text x="390" y="542" fill="#d1fae5" font-size="12" text-anchor="middle">Fill Level F = 65.0% (Current Measured Volume)</text>
+
+  <!-- Acoustic Reflections (Diffuse + Specular) -->
+  <line x1="330" y1="422" x2="380" y2="350" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4,3"/>
+  <line x1="430" y1="416" x2="415" y2="280" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4,3"/>
+  <line x1="480" y1="428" x2="520" y2="360" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="4,3"/>
+  <text x="470" y="385" fill="#d97706" font-size="10" font-weight="600">Acoustic Echo Returns</text>
+
+  <!-- Dimension Markers & Annotations Left -->
+  <!-- Total Empty Depth H = 30 cm -->
+  <line x1="165" y1="126" x2="165" y2="600" stroke="#dc2626" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line x1="150" y1="126" x2="220" y2="126" stroke="#dc2626" stroke-width="1" stroke-dasharray="2,2"/>
+  <line x1="150" y1="600" x2="220" y2="600" stroke="#dc2626" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="140" y="365" fill="#dc2626" font-size="13" font-weight="bold" text-anchor="middle" transform="rotate(-90 140 365)">Total Depth H = 30.0 cm</text>
+
+  <!-- Measured Distance d = 10.5 cm -->
+  <line x1="195" y1="126" x2="195" y2="425" stroke="#2563eb" stroke-width="2" marker-start="url(#arrowBlue)" marker-end="url(#arrowBlue)"/>
+  <text x="182" y="275" fill="#2563eb" font-size="12" font-weight="bold" text-anchor="middle" transform="rotate(-90 182 275)">Measured d = 10.5 cm</text>
+
+  <!-- Right Side Callout Cards -->
+  <!-- Card 1: Governing Formulas -->
+  <rect x="590" y="110" width="280" height="150" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="590" y="110" width="280" height="30" rx="8" fill="#0284c7"/>
+  <text x="605" y="130" fill="#ffffff" font-size="12" font-weight="bold">Mathematical Governing Equations</text>
+  <text x="605" y="160" fill="#1e293b" font-size="12" font-weight="600">1. Distance to Surface:</text>
+  <text x="620" y="178" fill="#0369a1" font-size="12" font-family="Courier New, monospace">d = (c(T) * t_echo) / 2</text>
+  <text x="605" y="200" fill="#1e293b" font-size="12" font-weight="600">2. Fill Level Calculation:</text>
+  <text x="620" y="218" fill="#0369a1" font-size="12" font-family="Courier New, monospace">Fill % = ((30 - d) / 30) * 100</text>
+  <text x="605" y="240" fill="#1e293b" font-size="11">Where t_echo is flight time (μs)</text>
+
+  <!-- Card 2: Physical Specifications -->
+  <rect x="590" y="280" width="280" height="180" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="590" y="280" width="280" height="30" rx="8" fill="#475569"/>
+  <text x="605" y="300" fill="#ffffff" font-size="12" font-weight="bold">Transducer Operating Parameters</text>
+  <text x="605" y="330" fill="#334155" font-size="11"><b>Sonic Frequency:</b> 40.0 kHz ± 1.0 kHz</text>
+  <text x="605" y="352" fill="#334155" font-size="11"><b>Acoustic Velocity (20°C):</b> 343.5 m/s</text>
+  <text x="605" y="374" fill="#334155" font-size="11"><b>Acoustic Flight Constant:</b> 58.22 μs / cm</text>
+  <text x="605" y="396" fill="#334155" font-size="11"><b>Conical Beam Footprint:</b> D = 2·d·tan(7.5°)</text>
+  <text x="605" y="418" fill="#334155" font-size="11"><b>At d = 30 cm:</b> Spot Diameter D ≈ 7.89 cm</text>
+  <text x="605" y="440" fill="#334155" font-size="11"><b>Outlier Filter:</b> 5-Point Rolling Median</text>
+
+  <!-- Card 3: Status Thresholds -->
+  <rect x="590" y="480" width="280" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="590" y="480" width="280" height="28" rx="8" fill="#15803d"/>
+  <text x="605" y="499" fill="#ffffff" font-size="12" font-weight="bold">Municipal Status Thresholds</text>
+  <text x="605" y="528" fill="#166534" font-size="11">● <b>Normal (Green):</b> Fill &lt; 70% (d &gt; 9.0 cm)</text>
+  <text x="605" y="550" fill="#854d0e" font-size="11">● <b>Nearly Full (Yellow):</b> 70% ≤ Fill &lt; 80%</text>
+  <text x="605" y="572" fill="#991b1b" font-size="11">● <b>Critical Dispatch (Red):</b> Fill ≥ 80% (d ≤ 6.0 cm)</text>
+</svg>

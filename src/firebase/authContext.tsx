@@ -14,8 +14,10 @@ export interface AppUser {
   uid: string;
   email: string | null;
   displayName: string | null;
+  phoneNumber?: string | null;
   role: UserRole;
   isFirebaseUser: boolean;
+  isOtpVerified?: boolean;
 }
 
 interface AuthContextType {
@@ -23,6 +25,8 @@ interface AuthContextType {
   loading: boolean;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string, role?: UserRole) => Promise<void>;
+  loginCitizenEmail: (email: string, pass: string, name?: string) => void;
+  loginCitizenPhone: (name: string, phone: string, isOtpVerified?: boolean) => void;
   loginDemo: (role: UserRole) => void;
   logout: () => Promise<void>;
   isFirebaseActive: boolean;
@@ -101,13 +105,47 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const loginCitizenEmail = (email: string, pass: string, name?: string) => {
+    const cleanEmail = email.trim() || 'citizen@example.com';
+    const cleanName = name?.trim() || cleanEmail.split('@')[0] || 'Citizen';
+    const citizenUser: AppUser = {
+      uid: `CITIZEN-${Date.now()}`,
+      email: cleanEmail,
+      displayName: cleanName,
+      phoneNumber: null,
+      role: 'citizen',
+      isFirebaseUser: false,
+      isOtpVerified: false
+    };
+    setCurrentUser(citizenUser);
+    localStorage.setItem('ecoroute_auth_user', JSON.stringify(citizenUser));
+  };
+
+  const loginCitizenPhone = (name: string, phone: string, isOtpVerified: boolean = false) => {
+    const cleanPhone = phone.trim();
+    const cleanName = name.trim() || 'Citizen Reporter';
+    const citizenUser: AppUser = {
+      uid: `CITIZEN-${Date.now()}`,
+      email: null,
+      displayName: cleanName,
+      phoneNumber: cleanPhone,
+      role: 'citizen',
+      isFirebaseUser: false,
+      isOtpVerified
+    };
+    setCurrentUser(citizenUser);
+    localStorage.setItem('ecoroute_auth_user', JSON.stringify(citizenUser));
+  };
+
   const loginDemo = (role: UserRole) => {
     const demoUser: AppUser = {
       uid: `DEMO-${role.toUpperCase()}`,
       email: `${role}@municipal.gov`,
       displayName: role === 'authority' ? 'Municipal Director' : role === 'driver' ? 'Ramesh Kumar (Driver)' : 'Citizen Aditya',
+      phoneNumber: null,
       role,
-      isFirebaseUser: false
+      isFirebaseUser: false,
+      isOtpVerified: false
     };
     setCurrentUser(demoUser);
     localStorage.setItem('ecoroute_auth_user', JSON.stringify(demoUser));
@@ -128,6 +166,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         loading,
         loginWithEmail,
         registerWithEmail,
+        loginCitizenEmail,
+        loginCitizenPhone,
         loginDemo,
         logout,
         isFirebaseActive

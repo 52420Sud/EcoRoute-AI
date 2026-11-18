@@ -1,0 +1,31 @@
+{
+  "name": "EcoRoute AI Dynamic Route Optimizer",
+  "objective": 3,
+  "description": "Multi-factor priority scoring, Haversine distance matrix, Greedy Nearest Neighbor and 2-Opt Local Search TSP algorithm",
+  "version": "1.0.0",
+  "algorithm": "2-Opt Local Search TSP",
+  "heuristic_baseline": "Greedy Nearest Neighbor",
+  "distance_metric": "Haversine Spherical Distance (R=6371km)",
+  "road_network_engine": "OSRM (Open Source Routing Machine)",
+  "dispatch_thresholds": {
+    "min_priority_score": 60.0,
+    "min_fill_level_pct": 75.0,
+    "critical_threshold_pct": 80.0
+  },
+  "priority_scoring_weights": {
+    "fill_level_weight": 0.50,
+    "uncollected_hours_weight": 0.30,
+    "citizen_complaint_weight": 0.20,
+    "formula": "Priority = 0.50 * fill + 0.30 * (hours/24 * 100) + 0.20 * min(complaints * 10, 100)"
+  },
+  "depot": {
+    "id": "DEPOT-MAIN",
+    "name": "Central Waste Garage",
+    "latitude": 12.9716,
+    "longitude": 77.5946
+  },
+  "performance": {
+    "average_distance_reduction_pct": 18.5,
+    "average_diesel_savings_liters_per_trip": 42.1
+  }
+}

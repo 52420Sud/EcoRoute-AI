@@ -1,5 +1,6 @@
 import React from 'react';
 import { useWaste } from '../../context/WasteContext';
+import { useAuth } from '../../firebase/authContext';
 import {
   Camera,
   Radio,
@@ -29,6 +30,7 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   onSelectBin
 }) => {
   const { dustbins, reports } = useWaste();
+  const { currentUser } = useAuth();
 
   const normalCount = dustbins.filter(b => b.status === 'Normal').length;
   const criticalCount = dustbins.filter(b => b.status === 'Critical').length;

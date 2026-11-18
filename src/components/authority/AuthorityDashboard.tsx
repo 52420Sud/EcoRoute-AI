@@ -3,6 +3,7 @@ import { useWaste } from '../../context/WasteContext';
 import { AnalyticsCharts } from './AnalyticsCharts';
 import { DustbinTable } from './DustbinTable';
 import { InteractiveMap } from '../map/InteractiveMap';
+import { DustbinDiagnosticsModal } from './DustbinDiagnosticsModal';
 import { Dustbin } from '../../types/waste';
 import {
   Archive,
@@ -29,14 +30,22 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
   onNavigateToTab,
   onOpenSimulatorForBin
 }) => {
-  const { dustbins, reports, alerts, activeRoute, depotLocation, hardwareInfo } = useWaste();
+  const { dustbins, reports, alerts, activeRoute, depotLocation, hardwareInfo, isBinIssuesIgnored } = useWaste();
 
   const [selectedDustbin, setSelectedDustbin] = useState<Dustbin | null>(null);
   const [dashboardMode, setDashboardMode] = useState<'city' | 'hardware'>('city');
+  const [diagnosingBin, setDiagnosingBin] = useState<Dustbin | null>(null);
+
+  // Standard container depth is 30.0 cm
+  const BIN_DEPTH_CM = 30.0;
 
   const hardwareReading = hardwareInfo?.recent_readings?.find((r: any) => r.dustbin_id === 'DB-003');
-  const hardwareDistance = hardwareReading?.distance_cm;
   const hardwareBin = dustbins.find(b => b.id === 'DB-003');
+  const hardwareDistance = hardwareReading?.distance_cm != null
+    ? Math.min(BIN_DEPTH_CM, Math.max(0, Number(hardwareReading.distance_cm)))
+    : hardwareBin && hardwareBin.fillLevel > 0
+    ? Number((BIN_DEPTH_CM * (1 - hardwareBin.fillLevel / 100)).toFixed(1))
+    : 30.0;
 
   // Core Statistics (PRD Section 8)
   const totalDustbins = dustbins.length;
@@ -46,6 +55,14 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
   const activeReports = reports.filter(r => r.status !== 'Resolved').length;
   const resolvedReports = reports.filter(r => r.status === 'Resolved').length;
   const pendingCollections = criticalDustbins + nearlyFullDustbins;
+
+  // Dustbins with active issues / errors for the click-to-diagnose feature (excluding ignored bins)
+  const criticalBinsList = dustbins.filter(b => b.status === 'Critical');
+  const warningBinsList = dustbins.filter(b => b.status === 'Nearly Full' || b.activeComplaintCount > 0);
+  const errorBins = [
+    ...criticalBinsList,
+    ...warningBinsList.filter(wb => !criticalBinsList.some(cb => cb.id === wb.id))
+  ].filter(b => !isBinIssuesIgnored(b.id));
 
   const displayedDustbins = dashboardMode === 'hardware' && hardwareBin ? [hardwareBin] : dustbins;
 
@@ -102,6 +119,55 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
         </div>
       </div>
 
+      {/* Active Dustbin Errors & Click-to-Diagnose Notification Banner */}
+      {errorBins.length > 0 && (
+        <div className="p-4 rounded-3xl bg-gradient-to-r from-rose-50 via-amber-50/70 to-rose-50 border-2 border-rose-300/80 shadow-md flex flex-wrap items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center font-black shadow-md shrink-0">
+              <AlertTriangle className="w-6 h-6 animate-bounce" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-black text-rose-950">
+                  {errorBins.length} Dustbin Error{errorBins.length > 1 ? 's' : ''} / Warning{errorBins.length > 1 ? 's' : ''} Detected
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-600 text-white animate-pulse">
+                  Action Required
+                </span>
+              </div>
+              <p className="text-xs text-rose-800 mt-0.5">
+                Click any error badge below to inspect <b>what's wrong</b>, ultrasonic sensor metrics, citizen photos, and AI route resolution:
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {errorBins.slice(0, 6).map(bin => {
+              const isCrit = bin.status === 'Critical';
+              return (
+                <button
+                  key={bin.id}
+                  onClick={() => setDiagnosingBin(bin)}
+                  className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs border transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+                    isCrit
+                      ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-700'
+                      : 'bg-white hover:bg-amber-50 text-amber-900 border-amber-300'
+                  }`}
+                  title={`Click to view error diagnosis for ${bin.id}`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${isCrit ? 'bg-white animate-ping' : 'bg-amber-500'}`} />
+                  <span className="font-mono font-black">{bin.id}</span>
+                  <span>({bin.fillLevel}%)</span>
+                  <span className="text-[10px] bg-black/15 px-1.5 py-0.5 rounded-md font-extrabold">
+                    View Issue →
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Dashboard Statistics Cards (PRD Section 8) */}
       {dashboardMode === 'hardware' ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
@@ -138,20 +204,39 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
               Sensor Distance
             </span>
             <div className="text-2xl font-black text-blue-700 mt-0.5">
-              {hardwareDistance != null ? `${hardwareDistance} cm` : '50.3 cm'}
+              {hardwareDistance != null ? `${hardwareDistance} cm` : '30.0 cm'}
             </div>
-            <span className="text-[10px] text-blue-600 block mt-1">HC-SR04 Ultrasonic</span>
+            <span className="text-[10px] text-blue-600 block mt-1">HC-SR04 Ultrasonic (30 cm depth)</span>
           </div>
 
-          {/* Status */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+          {/* Status - Clickable when error appears */}
+          <div
+            onClick={() => {
+              if (hardwareBin) setDiagnosingBin(hardwareBin);
+            }}
+            className={`p-4 rounded-2xl border shadow-sm transition-all ${
+              hardwareBin?.status === 'Critical'
+                ? 'bg-rose-50/80 border-rose-300 hover:border-rose-400 cursor-pointer hover:shadow-md'
+                : 'bg-white border-slate-200'
+            }`}
+          >
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
               Current State
             </span>
-            <div className="text-2xl font-black text-slate-800 mt-0.5">
+            <div className={`text-2xl font-black mt-0.5 ${
+              hardwareBin?.status === 'Critical' ? 'text-rose-600' : 'text-slate-800'
+            }`}>
               {hardwareBin?.status ?? 'Normal'}
             </div>
-            <span className="text-[10px] text-slate-400 block mt-1">Operational</span>
+            <span className="text-[10px] text-slate-400 block mt-1">
+              {hardwareBin?.status === 'Critical' ? (
+                <span className="text-rose-600 font-bold underline flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" /> Error: Click to view why →
+                </span>
+              ) : (
+                'Operational'
+              )}
+            </span>
           </div>
 
           {/* Battery */}
@@ -231,10 +316,17 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
             <span className="text-[10px] text-amber-600 block mt-1">51–80% Fill</span>
           </div>
 
-          {/* Critical Dustbins */}
+          {/* Critical Dustbins - Click to inspect error diagnostics */}
           <div
-            onClick={() => onNavigateToTab('dustbins')}
-            className="bg-rose-50/70 p-4 rounded-2xl border border-rose-200 shadow-sm hover:border-rose-400 transition-all cursor-pointer group"
+            onClick={() => {
+              if (criticalBinsList.length > 0) {
+                setDiagnosingBin(criticalBinsList[0]);
+              } else {
+                onNavigateToTab('dustbins');
+              }
+            }}
+            className="bg-rose-50/70 p-4 rounded-2xl border border-rose-200 shadow-sm hover:border-rose-400 transition-all cursor-pointer group hover:scale-[1.02]"
+            title={criticalDustbins > 0 ? 'Click to inspect critical dustbin error and what is wrong' : 'View Dustbins'}
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-rose-700 uppercase tracking-wider block">
@@ -247,7 +339,9 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
             <div className="text-2xl font-black text-rose-700 mt-0.5">
               {criticalDustbins}
             </div>
-            <span className="text-[10px] text-rose-600 block mt-1">&gt; 80% Action Req.</span>
+            <span className="text-[10px] text-rose-600 block mt-1 font-bold">
+              {criticalDustbins > 0 ? 'Click to inspect error →' : '> 80% Action Req.'}
+            </span>
           </div>
 
           {/* Active Reports */}
@@ -350,6 +444,20 @@ export const AuthorityDashboard: React.FC<AuthorityDashboardProps> = ({
           window.scrollTo({ top: 380, behavior: 'smooth' });
         }}
         onOpenSimulatorForBin={onOpenSimulatorForBin}
+        onNavigateToRoute={() => onNavigateToTab('route')}
+      />
+
+      {/* Dustbin Issue Diagnostics & Error Inspection Modal */}
+      <DustbinDiagnosticsModal
+        dustbin={diagnosingBin}
+        isOpen={Boolean(diagnosingBin)}
+        onClose={() => setDiagnosingBin(null)}
+        onInspectOnMap={bin => {
+          setSelectedDustbin(bin);
+          window.scrollTo({ top: 380, behavior: 'smooth' });
+        }}
+        onOpenSimulatorForBin={onOpenSimulatorForBin}
+        onNavigateToRoute={() => onNavigateToTab('route')}
       />
     </div>
   );

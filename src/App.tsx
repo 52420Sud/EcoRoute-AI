@@ -3,6 +3,7 @@ import { WasteProvider, useWaste } from './context/WasteContext';
 import { AuthProvider, useAuth } from './firebase/authContext';
 import { Navbar, ActivePortal, PublicTab, AuthorityTab } from './components/navbar/Navbar';
 import { PublicHome } from './components/public/PublicHome';
+import { CitizenSignIn } from './components/public/CitizenSignIn';
 import { ReportDustbinPage } from './components/public/ReportDustbinPage';
 import { TrackReportPage } from './components/public/TrackReportPage';
 import { AboutProject } from './components/public/AboutProject';
@@ -31,6 +32,7 @@ import {
 } from 'lucide-react';
 
 const MainApp: React.FC = () => {
+  const { currentUser } = useAuth();
   const [portal, setPortal] = useState<ActivePortal>('public');
   const [publicTab, setPublicTab] = useState<PublicTab>('home');
   const [authorityTab, setAuthorityTab] = useState<AuthorityTab>('dashboard');
@@ -86,6 +88,13 @@ const MainApp: React.FC = () => {
         {/* PUBLIC PORTAL */}
         {portal === 'public' && (
           <div>
+            {publicTab === 'signin' && (
+              <CitizenSignIn
+                onSignedIn={() => setPublicTab('report')}
+                onBrowseHome={() => setPublicTab('home')}
+              />
+            )}
+
             {publicTab === 'home' && (
               <PublicHome
                 onGoToReport={() => setPublicTab('report')}

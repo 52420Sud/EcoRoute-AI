@@ -1,0 +1,61 @@
+trip_id,date,vehicle_id,driver_name,routing_strategy,stops_scheduled,stops_collected,distance_km,travel_time_minutes,fuel_consumed_liters,fuel_saved_liters,co2_emissions_kg,co2_saved_kg,cost_per_ton_inr,efficiency_gain_percent
+TRIP-TRAD-001,2026-10-15,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,43.5,194,11.4,0.0,30.6,0.0,1470.2,0.0
+TRIP-AI-001,2026-10-15,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),7,7,26.6,94,6.5,4.9,17.4,13.2,898.3,38.9
+TRIP-TRAD-002,2026-10-16,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,43.7,194,11.5,0.0,30.8,0.0,1509.0,0.0
+TRIP-AI-002,2026-10-16,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),11,11,29.0,116,7.1,4.4,19.0,11.8,1002.0,33.6
+TRIP-TRAD-003,2026-10-17,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,43.0,192,11.3,0.0,30.3,0.0,1587.1,0.0
+TRIP-AI-003,2026-10-17,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),11,11,28.8,116,7.0,4.3,18.8,11.5,1063.4,33.0
+TRIP-TRAD-004,2026-10-18,KA-20-TR-1022,Manjunath Pai,Traditional Static Fixed Route,18,18,42.5,191,11.2,0.0,30.0,0.0,1490.9,0.0
+TRIP-AI-004,2026-10-18,KA-20-TR-1022,Manjunath Pai,EcoRoute AI (Heuristic TSP + Priority Fill),8,8,27.1,100,6.6,4.6,17.7,12.3,951.2,36.2
+TRIP-TRAD-005,2026-10-19,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,45.9,201,12.1,0.0,32.4,0.0,1547.2,0.0
+TRIP-AI-005,2026-10-19,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),7,7,31.5,107,7.7,4.4,20.6,11.8,1061.4,31.4
+TRIP-TRAD-006,2026-10-20,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,46.2,201,12.2,0.0,32.7,0.0,1490.6,0.0
+TRIP-AI-006,2026-10-20,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,30.0,111,7.3,4.9,19.6,13.1,967.4,35.1
+TRIP-TRAD-007,2026-10-21,KA-20-TR-1022,Manjunath Pai,Traditional Static Fixed Route,18,18,44.9,198,11.8,0.0,31.6,0.0,1515.8,0.0
+TRIP-AI-007,2026-10-21,KA-20-TR-1022,Manjunath Pai,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,29.5,110,7.2,4.6,19.3,12.3,995.9,34.3
+TRIP-TRAD-008,2026-10-22,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,42.8,192,11.3,0.0,30.3,0.0,1590.5,0.0
+TRIP-AI-008,2026-10-22,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),8,8,29.1,105,7.1,4.2,19.0,11.3,1081.5,32.0
+TRIP-TRAD-009,2026-10-23,KA-20-TR-1022,Manjunath Pai,Traditional Static Fixed Route,18,18,47.0,204,12.4,0.0,33.2,0.0,1533.6,0.0
+TRIP-AI-009,2026-10-23,KA-20-TR-1022,Manjunath Pai,EcoRoute AI (Heuristic TSP + Priority Fill),10,10,32.1,120,7.8,4.6,20.9,12.3,1047.4,31.7
+TRIP-TRAD-010,2026-10-24,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,43.6,194,11.5,0.0,30.8,0.0,1520.6,0.0
+TRIP-AI-010,2026-10-24,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),8,8,29.5,106,7.2,4.3,19.3,11.5,1029.4,32.3
+TRIP-TRAD-011,2026-10-25,KA-20-TR-1022,Manjunath Pai,Traditional Static Fixed Route,18,18,46.3,202,12.2,0.0,32.7,0.0,1543.4,0.0
+TRIP-AI-011,2026-10-25,KA-20-TR-1022,Manjunath Pai,EcoRoute AI (Heuristic TSP + Priority Fill),7,7,29.1,101,7.1,5.1,19.0,13.7,970.8,37.1
+TRIP-TRAD-012,2026-10-26,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,42.2,190,11.1,0.0,29.7,0.0,1528.3,0.0
+TRIP-AI-012,2026-10-26,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),8,8,27.8,102,6.8,4.3,18.2,11.5,1007.1,34.1
+TRIP-TRAD-013,2026-10-27,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,47.5,205,12.5,0.0,33.5,0.0,1570.3,0.0
+TRIP-AI-013,2026-10-27,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),7,7,31.0,106,7.6,4.9,20.4,13.1,1025.4,34.7
+TRIP-TRAD-014,2026-10-28,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,45.8,200,12.1,0.0,32.4,0.0,1560.6,0.0
+TRIP-AI-014,2026-10-28,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,28.8,108,7.0,5.1,18.8,13.6,981.6,37.1
+TRIP-TRAD-015,2026-10-29,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,45.2,199,11.9,0.0,31.9,0.0,1466.6,0.0
+TRIP-AI-015,2026-10-29,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,31.8,116,7.8,4.1,20.9,11.0,1032.5,29.6
+TRIP-TRAD-016,2026-10-30,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,45.9,201,12.1,0.0,32.4,0.0,1574.9,0.0
+TRIP-AI-016,2026-10-30,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,32.9,118,8.0,4.1,21.4,11.0,1129.2,28.3
+TRIP-TRAD-017,2026-10-31,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,47.4,205,12.5,0.0,33.5,0.0,1471.3,0.0
+TRIP-AI-017,2026-10-31,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),11,11,30.7,121,7.5,5.0,20.1,13.4,953.4,35.2
+TRIP-TRAD-018,2026-11-01,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,47.5,205,12.5,0.0,33.5,0.0,1541.2,0.0
+TRIP-AI-018,2026-11-01,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),8,8,29.0,104,7.1,5.4,19.0,14.5,941.7,38.9
+TRIP-TRAD-019,2026-11-02,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,42.7,192,11.2,0.0,30.0,0.0,1462.7,0.0
+TRIP-AI-019,2026-11-02,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),10,10,29.5,114,7.2,4.0,19.3,10.7,1010.7,30.9
+TRIP-TRAD-020,2026-11-03,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,45.1,198,11.9,0.0,31.9,0.0,1463.3,0.0
+TRIP-AI-020,2026-11-03,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),11,11,27.2,112,6.6,5.3,17.7,14.2,882.4,39.7
+TRIP-TRAD-021,2026-11-04,KA-20-MB-8891,Sunil Gowda,Traditional Static Fixed Route,18,18,43.8,195,11.5,0.0,30.8,0.0,1451.2,0.0
+TRIP-AI-021,2026-11-04,KA-20-MB-8891,Sunil Gowda,EcoRoute AI (Heuristic TSP + Priority Fill),8,8,30.9,109,7.5,4.0,20.1,10.7,1023.1,29.5
+TRIP-TRAD-022,2026-11-05,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,42.9,192,11.3,0.0,30.3,0.0,1503.8,0.0
+TRIP-AI-022,2026-11-05,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,27.4,104,6.7,4.6,18.0,12.3,960.9,36.1
+TRIP-TRAD-023,2026-11-06,KA-20-TR-1022,Manjunath Pai,Traditional Static Fixed Route,18,18,45.6,200,12.0,0.0,32.2,0.0,1504.1,0.0
+TRIP-AI-023,2026-11-06,KA-20-TR-1022,Manjunath Pai,EcoRoute AI (Heuristic TSP + Priority Fill),11,11,29.8,118,7.3,4.7,19.6,12.6,983.7,34.6
+TRIP-TRAD-024,2026-11-07,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,46.6,202,12.3,0.0,33.0,0.0,1597.4,0.0
+TRIP-AI-024,2026-11-07,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,32.5,117,7.9,4.4,21.2,11.8,1113.4,30.3
+TRIP-TRAD-025,2026-11-08,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,42.0,190,11.1,0.0,29.7,0.0,1512.6,0.0
+TRIP-AI-025,2026-11-08,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,29.5,110,7.2,3.9,19.3,10.4,1061.8,29.8
+TRIP-TRAD-026,2026-11-09,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,45.6,200,12.0,0.0,32.2,0.0,1577.9,0.0
+TRIP-AI-026,2026-11-09,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),9,9,30.5,112,7.4,4.6,19.8,12.4,1055.6,33.1
+TRIP-TRAD-027,2026-11-10,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,45.7,200,12.0,0.0,32.2,0.0,1512.2,0.0
+TRIP-AI-027,2026-11-10,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),7,7,29.9,103,7.3,4.7,19.6,12.6,989.0,34.6
+TRIP-TRAD-028,2026-11-11,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,42.3,190,11.1,0.0,29.7,0.0,1555.9,0.0
+TRIP-AI-028,2026-11-11,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),7,7,30.1,103,7.3,3.8,19.6,10.1,1107.8,28.8
+TRIP-TRAD-029,2026-11-12,KA-20-TR-1022,Manjunath Pai,Traditional Static Fixed Route,18,18,46.5,202,12.2,0.0,32.7,0.0,1555.5,0.0
+TRIP-AI-029,2026-11-12,KA-20-TR-1022,Manjunath Pai,EcoRoute AI (Heuristic TSP + Priority Fill),7,7,29.1,101,7.1,5.1,19.0,13.7,973.7,37.4
+TRIP-TRAD-030,2026-11-13,KA-20-EA-4412,Ramesh Kumar,Traditional Static Fixed Route,18,18,43.3,193,11.4,0.0,30.6,0.0,1549.9,0.0
+TRIP-AI-030,2026-11-13,KA-20-EA-4412,Ramesh Kumar,EcoRoute AI (Heuristic TSP + Priority Fill),8,8,27.8,102,6.8,4.6,18.2,12.4,995.0,35.8

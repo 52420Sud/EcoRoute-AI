@@ -1,0 +1,77 @@
+{
+  "project": "EcoRoute AI - Smart IoT Waste Management & Route Optimization",
+  "generated_at": "2026-11-14 15:41:22",
+  "version": "1.0.0 (Presentation Ready)",
+  "datasets_included": [
+    {
+      "file": "smart_dustbins_master.csv",
+      "description": "Asset registry of 18 municipal IoT dustbins across 7 urban zones",
+      "records": 18,
+      "key_columns": [
+        "dustbin_id",
+        "zone",
+        "capacity_liters",
+        "container_depth_cm",
+        "latitude",
+        "longitude"
+      ]
+    },
+    {
+      "file": "iot_sensor_telemetry.csv",
+      "description": "30-day hourly ultrasonic distance, fill-level, temperature, and battery telemetry",
+      "records": 12960,
+      "key_columns": [
+        "timestamp",
+        "dustbin_id",
+        "distance_cm",
+        "fill_level_percent",
+        "battery_percent",
+        "overflow_alert_triggered"
+      ]
+    },
+    {
+      "file": "citizen_grievance_reports.csv",
+      "description": "Citizen public grievance reports backed by cryptographic 6-digit mobile OTP verification",
+      "records": 500,
+      "key_columns": [
+        "report_id",
+        "issue_type",
+        "otp_verified",
+        "status",
+        "resolution_time_hours"
+      ]
+    },
+    {
+      "file": "route_optimization_metrics.csv",
+      "description": "Head-to-head fleet logistics benchmark: Traditional Static Schedule vs EcoRoute AI Dynamic Route",
+      "records": 60,
+      "key_columns": [
+        "routing_strategy",
+        "distance_km",
+        "fuel_saved_liters",
+        "co2_saved_kg",
+        "efficiency_gain_percent"
+      ]
+    },
+    {
+      "file": "ml_fill_prediction_dataset.csv",
+      "description": "Feature matrix for Random Forest & Regression Time-to-Overflow predictive ML model",
+      "records": 3000,
+      "key_columns": [
+        "current_fill_percent",
+        "fill_rate_past_3h_pct_hr",
+        "target_hours_to_overflow",
+        "target_critical_within_2hr"
+      ]
+    }
+  ],
+  "presentation_key_findings": {
+    "total_iot_readings": 12960,
+    "average_distance_reduction_pct": 32.4,
+    "fuel_savings_per_truck_month_liters": 138.5,
+    "co2_emissions_eliminated_kg": 371.2,
+    "citizen_complaint_resolution_rate_pct": 94.2,
+    "average_resolution_time_hours": 1.9,
+    "ml_prediction_accuracy_r2": 0.941
+  }
+}

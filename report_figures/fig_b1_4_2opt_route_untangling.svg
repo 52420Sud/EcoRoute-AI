@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="1000" height="680" style="background:#ffffff; font-family:'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="boxShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="680" fill="#ffffff"/>
+
+  <!-- Title Banner -->
+  <rect x="30" y="20" width="940" height="48" rx="8" fill="url(#titleGrad)"/>
+  <text x="500" y="50" fill="#f8fafc" font-size="18" font-weight="bold" text-anchor="middle">Figure B.1.4: 2-Opt Combinatorial Edge-Swap Geometric Route Untangling &amp; Distance Reduction</text>
+
+  <!-- Left Panel: Before 2-Opt (Sub-Optimal Crossing Tour) -->
+  <g transform="translate(40, 90)" filter="url(#boxShadow)">
+    <rect width="440" height="470" rx="10" fill="#fff5f5" stroke="#fca5a5" stroke-width="2"/>
+    <rect width="440" height="36" rx="10" fill="#ef4444"/>
+    <text x="220" y="24" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">BEFORE 2-OPT: Intersecting Tour (15.6 km)</text>
+
+    <!-- Depot & Bins -->
+    <!-- Depot -->
+    <rect x="50" y="220" width="36" height="36" rx="4" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+    <text x="68" y="243" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">DEP</text>
+    <text x="68" y="272" fill="#334155" font-size="10" font-weight="600" text-anchor="middle">Depot</text>
+
+    <!-- Node u_i (DB-001) -->
+    <circle cx="160" cy="110" r="16" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+    <text x="160" y="115" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_i</text>
+    <text x="160" y="85" fill="#991b1b" font-size="11" font-weight="bold" text-anchor="middle">Node u_i (DB-001)</text>
+
+    <!-- Node u_i+1 (DB-007) -->
+    <circle cx="360" cy="380" r="16" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+    <text x="360" y="385" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_i+1</text>
+    <text x="360" y="415" fill="#991b1b" font-size="11" font-weight="bold" text-anchor="middle">Node u_i+1 (DB-007)</text>
+
+    <!-- Node u_j (DB-003) -->
+    <circle cx="360" cy="110" r="16" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+    <text x="360" y="115" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_j</text>
+    <text x="360" y="85" fill="#991b1b" font-size="11" font-weight="bold" text-anchor="middle">Node u_j (DB-003)</text>
+
+    <!-- Node u_j+1 (DB-005) -->
+    <circle cx="160" cy="380" r="16" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+    <text x="160" y="385" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_j+1</text>
+    <text x="160" y="415" fill="#991b1b" font-size="11" font-weight="bold" text-anchor="middle">Node u_j+1 (DB-005)</text>
+
+    <!-- Crossing Edge 1: u_i -> u_i+1 -->
+    <line x1="172" y1="122" x2="348" y2="368" stroke="#dc2626" stroke-width="3" marker-end="url(#arrRed)"/>
+    
+    <!-- Crossing Edge 2: u_j -> u_j+1 -->
+    <line x1="348" y1="122" x2="172" y2="368" stroke="#dc2626" stroke-width="3" marker-end="url(#arrRed)"/>
+
+    <!-- Intersection Point X -->
+    <circle cx="260" cy="245" r="8" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+    <text x="260" y="230" fill="#b45309" font-size="11" font-weight="bold" text-anchor="middle">Crossing Point X</text>
+
+    <!-- Perimeter Sub-paths -->
+    <path d="M 86 230 L 145 118" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
+    <path d="M 370 125 L 390 240 L 375 365" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
+    <text x="410" y="245" fill="#475569" font-size="10" font-weight="600">Subpath</text>
+    <path d="M 148 375 L 86 245" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
+
+    <!-- Inefficient Tour Warning Callout -->
+    <rect x="25" y="430" width="390" height="28" rx="5" fill="#fee2e2" stroke="#ef4444"/>
+    <text x="220" y="449" fill="#991b1b" font-size="11" font-weight="bold" text-anchor="middle">⚠️ Crossing Edges Violate Triangle Inequality (Extra 3.2 km)</text>
+  </g>
+
+  <!-- Right Panel: After 2-Opt (Untangled Optimal Tour) -->
+  <g transform="translate(520, 90)" filter="url(#boxShadow)">
+    <rect width="440" height="470" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+    <rect width="440" height="36" rx="10" fill="#16a34a"/>
+    <text x="220" y="24" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">AFTER 2-OPT: Untangled Optimal Tour (12.4 km)</text>
+
+    <!-- Depot & Bins (Same Coordinates) -->
+    <!-- Depot -->
+    <rect x="50" y="220" width="36" height="36" rx="4" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+    <text x="68" y="243" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">DEP</text>
+    <text x="68" y="272" fill="#334155" font-size="10" font-weight="600" text-anchor="middle">Depot</text>
+
+    <!-- Node u_i -->
+    <circle cx="160" cy="110" r="16" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+    <text x="160" y="115" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_i</text>
+    <text x="160" y="85" fill="#15803d" font-size="11" font-weight="bold" text-anchor="middle">Node u_i (DB-001)</text>
+
+    <!-- Node u_j (Directly connected to u_i) -->
+    <circle cx="360" cy="110" r="16" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+    <text x="360" y="115" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_j</text>
+    <text x="360" y="85" fill="#15803d" font-size="11" font-weight="bold" text-anchor="middle">Node u_j (DB-003)</text>
+
+    <!-- Node u_i+1 (Reversed Connection) -->
+    <circle cx="360" cy="380" r="16" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+    <text x="360" y="385" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_i+1</text>
+    <text x="360" y="415" fill="#15803d" font-size="11" font-weight="bold" text-anchor="middle">Node u_i+1 (DB-007)</text>
+
+    <!-- Node u_j+1 -->
+    <circle cx="160" cy="380" r="16" fill="#16a34a" stroke="#15803d" stroke-width="2"/>
+    <text x="160" y="385" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">u_j+1</text>
+    <text x="160" y="415" fill="#15803d" font-size="11" font-weight="bold" text-anchor="middle">Node u_j+1 (DB-005)</text>
+
+    <!-- Swapped New Edge 1: u_i -> u_j (Horizontal Top) -->
+    <line x1="178" y1="110" x2="340" y2="110" stroke="#16a34a" stroke-width="3.5" marker-end="url(#arrGreen)"/>
+    <text x="260" y="100" fill="#15803d" font-size="11" font-weight="bold" text-anchor="middle">New Edge: d(u_i, u_j)</text>
+
+    <!-- Reversed Intermediate Segment -->
+    <path d="M 360 128 L 360 360" stroke="#16a34a" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrGreen)"/>
+    <text x="395" y="245" fill="#15803d" font-size="10" font-weight="bold" transform="rotate(90 395 245)">Reversed Segment</text>
+
+    <!-- Swapped New Edge 2: u_i+1 -> u_j+1 (Horizontal Bottom) -->
+    <line x1="340" y1="380" x2="180" y2="380" stroke="#16a34a" stroke-width="3.5" marker-end="url(#arrGreen)"/>
+    <text x="260" y="370" fill="#15803d" font-size="11" font-weight="bold" text-anchor="middle">New Edge: d(u_i+1, u_j+1)</text>
+
+    <!-- Perimeter Sub-paths -->
+    <path d="M 86 230 L 145 118" stroke="#15803d" stroke-width="2"/>
+    <path d="M 148 375 L 86 245" stroke="#15803d" stroke-width="2"/>
+
+    <!-- Optimization Achievement Callout -->
+    <rect x="25" y="430" width="390" height="28" rx="5" fill="#dcfce7" stroke="#22c55e"/>
+    <text x="220" y="449" fill="#15803d" font-size="11" font-weight="bold" text-anchor="middle">✓ Zero Self-Intersections | 20.5% Less Fuel &amp; Time</text>
+  </g>
+
+  <!-- Bottom Proof & Formula Card -->
+  <rect x="40" y="580" width="920" height="75" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="40" y="580" width="920" height="24" rx="8" fill="#334155"/>
+  <text x="500" y="597" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">Euclidean Triangle Inequality 2-Opt Distance Reduction Proof</text>
+  
+  <text x="500" y="622" fill="#0f172a" font-size="12" font-family="Courier New, monospace" text-anchor="middle">
+    ΔD = [d(u_i, u_j) + d(u_i+1, u_j+1)] - [d(u_i, u_i+1) + d(u_j, u_j+1)] &lt; 0
+  </text>
+  <text x="500" y="642" fill="#475569" font-size="11" text-anchor="middle">
+    By strict triangle inequality on △u_i·X·u_j and △u_i+1·X·u_j+1, any intersection X yields a strictly negative ΔD.
+  </text>
+</svg>

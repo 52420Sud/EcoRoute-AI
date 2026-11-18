@@ -229,14 +229,14 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
             <div className="pt-2 border-t border-slate-100 space-y-1.5 text-xs">
               <div className="flex justify-between font-semibold text-slate-700">
                 <span>Critical Threshold Cutoff:</span>
-                <span className="font-bold text-rose-700">&gt; {weights.criticalThreshold || 70}%</span>
+                <span className="font-bold text-rose-700">&gt; {weights.criticalThreshold || 80}%</span>
               </div>
               <input
                 type="range"
-                min="50"
-                max="90"
+                min="60"
+                max="95"
                 step="5"
-                value={weights.criticalThreshold || 70}
+                value={weights.criticalThreshold || 80}
                 onChange={e => {
                   const val = parseInt(e.target.value);
                   setWeights(w => ({ ...w, criticalThreshold: val }));
@@ -247,7 +247,32 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
                 }}
                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-600"
               />
-              <span className="text-[10px] text-slate-400 block">Dustbins exceeding {weights.criticalThreshold || 70}% are classified as Critical priority</span>
+              <span className="text-[10px] text-slate-400 block">Dustbins exceeding {weights.criticalThreshold || 80}% are classified as Critical priority</span>
+            </div>
+
+            {/* Medium Threshold Slider (50% - 60%) */}
+            <div className="pt-2 border-t border-slate-100 space-y-1.5 text-xs">
+              <div className="flex justify-between font-semibold text-slate-700">
+                <span>Medium Priority Range:</span>
+                <span className="font-bold text-amber-700">{weights.mediumThreshold || 50}% – {weights.criticalThreshold || 80}% (50%–60% warning)</span>
+              </div>
+              <input
+                type="range"
+                min="40"
+                max="75"
+                step="5"
+                value={weights.mediumThreshold || 50}
+                onChange={e => {
+                  const val = parseInt(e.target.value);
+                  setWeights(w => ({ ...w, mediumThreshold: val }));
+                  setTimeout(() => {
+                    const p = generateRoute(selectedVehicleId);
+                    setCurrentPlan(p);
+                  }, 50);
+                }}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+              />
+              <span className="text-[10px] text-slate-400 block">Dustbins between {weights.mediumThreshold || 50}% and {weights.criticalThreshold || 80}% (e.g. 50%–60%) are classified as Medium priority</span>
             </div>
           </div>
 
@@ -264,11 +289,11 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
             </div>
 
             <p className="text-xs text-slate-500">
-              Select which areas to include. The route is strictly sequenced: <b>Critical (&gt;{weights.criticalThreshold || 70}%) first</b>, then Medium, then Low.
+              Select which areas to include. The route is strictly sequenced: <b>Critical (&gt;{weights.criticalThreshold || 80}%) first</b>, then Medium (50%–60%), then Low.
             </p>
 
             <div className="space-y-2.5">
-              {/* Option 1: Critical Only (>70%) */}
+              {/* Option 1: Critical Only (>80%) */}
               <button
                 onClick={() => {
                   setWeights(w => ({ ...w, routeTierFilter: 'critical_only' }));
@@ -288,18 +313,18 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
                 </div>
                 <div>
                   <div className="font-bold flex items-center gap-1.5">
-                    <span>Critical Only (&gt; {weights.criticalThreshold || 70}%)</span>
+                    <span>Critical Only (&gt; {weights.criticalThreshold || 80}%)</span>
                     <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-rose-200 text-rose-800">
                       Emergency
                     </span>
                   </div>
                   <div className="text-[11px] opacity-80 mt-0.5">
-                    Routes ONLY critical bins (&gt;{weights.criticalThreshold || 70}%) or with active citizen complaints.
+                    Routes ONLY critical bins (&gt;{weights.criticalThreshold || 80}%) or with active citizen complaints.
                   </div>
                 </div>
               </button>
 
-              {/* Option 2: Critical (>70%) then Medium (40-70%) */}
+              {/* Option 2: Critical (>80%) then Medium (50%–60%) */}
               <button
                 onClick={() => {
                   setWeights(w => ({ ...w, routeTierFilter: 'critical_then_medium' }));
@@ -319,13 +344,13 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
                 </div>
                 <div>
                   <div className="font-bold flex items-center gap-1.5">
-                    <span>Critical (&gt; {weights.criticalThreshold || 70}%) → Medium</span>
+                    <span>Critical (&gt; {weights.criticalThreshold || 80}%) → Medium (50%–60%)</span>
                     <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-200 text-amber-900">
                       Balanced
                     </span>
                   </div>
                   <div className="text-[11px] opacity-80 mt-0.5">
-                    Visits all Critical (&gt;{weights.criticalThreshold || 70}%) areas first, then continues to Medium (40%–{weights.criticalThreshold || 70}%) locations.
+                    Visits all Critical (&gt;{weights.criticalThreshold || 80}%) areas first, then continues to Medium ({weights.mediumThreshold || 50}%–{weights.criticalThreshold || 80}%, covering 50%–60% high-fill) locations.
                   </div>
                 </div>
               </button>
@@ -356,7 +381,7 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
                     </span>
                   </div>
                   <div className="text-[11px] opacity-80 mt-0.5">
-                    Full municipal sweep routed strictly in order: Critical first, then Medium, then Low.
+                    Full municipal sweep routed strictly in order: Critical (&gt;{weights.criticalThreshold || 80}%) first, then Medium (50%–60%), then Low (&lt;{weights.mediumThreshold || 50}%).
                   </div>
                 </div>
               </button>
@@ -487,25 +512,25 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
                   </span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-extrabold border border-rose-200">
                     <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
-                    {currentPlan.stops.filter(s => s.tier === 'Critical').length} Critical (&gt;{weights.criticalThreshold || 70}%)
+                    {currentPlan.stops.filter(s => s.tier === 'Critical').length} Critical (&gt;{weights.criticalThreshold || 80}%)
                   </span>
                   {currentPlan.stops.filter(s => s.tier === 'Medium').length > 0 && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold border border-amber-200">
                       <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                      {currentPlan.stops.filter(s => s.tier === 'Medium').length} Medium (40%–{weights.criticalThreshold || 70}%)
+                      {currentPlan.stops.filter(s => s.tier === 'Medium').length} Medium ({weights.mediumThreshold || 50}%–{weights.criticalThreshold || 80}%)
                     </span>
                   )}
                   {currentPlan.stops.filter(s => s.tier === 'Low').length > 0 && (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-medium border border-emerald-200">
                       <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      {currentPlan.stops.filter(s => s.tier === 'Low').length} Low (&lt;40%)
+                      {currentPlan.stops.filter(s => s.tier === 'Low').length} Low (&lt;{weights.mediumThreshold || 50}%)
                     </span>
                   )}
                 </div>
 
                 <div className="text-[11px] font-semibold text-slate-600 bg-white px-3 py-1 rounded-xl border border-slate-200/80 flex items-center gap-1.5 shadow-xs">
                   <span className="text-emerald-700 font-bold">Rule:</span>
-                  <span>1st Critical (&gt;{weights.criticalThreshold || 70}%) ➔ 2nd Medium ➔ 3rd Low</span>
+                  <span>1st Critical (&gt;{weights.criticalThreshold || 80}%) ➔ 2nd Medium (50%–60%) ➔ 3rd Low</span>
                 </div>
               </div>
 
@@ -566,15 +591,15 @@ export const RouteOptimizationView: React.FC<RouteOptimizationViewProps> = ({
                               {stop.tier === 'Critical' || isCrit ? (
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800 border border-rose-200">
                                   <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
-                                  1: Critical (&gt;{weights.criticalThreshold || 70}%)
+                                  1: Critical (&gt;{weights.criticalThreshold || 80}%)
                                 </span>
                               ) : stop.tier === 'Medium' || isMed ? (
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
-                                  2: Medium (40%–{weights.criticalThreshold || 70}%)
+                                  2: Medium ({weights.mediumThreshold || 50}%–{weights.criticalThreshold || 80}%)
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-900 border border-emerald-200">
-                                  3: Low (&lt;40%)
+                                  3: Low (&lt;{weights.mediumThreshold || 50}%)
                                 </span>
                               )}
                             </td>

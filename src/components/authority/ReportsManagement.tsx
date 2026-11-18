@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWaste } from '../../context/WasteContext';
 import { PublicReport, ReportStatus } from '../../types/waste';
 import {
@@ -22,6 +22,18 @@ export const ReportsManagement: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<PublicReport | null>(null);
   const [statusFilter, setStatusFilter] = useState<'All' | ReportStatus>('All');
   const [search, setSearch] = useState('');
+
+  // Keyboard shortcut: close modal on Escape key
+  useEffect(() => {
+    if (!selectedReport) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedReport(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedReport]);
 
   // Editing state for modal
   const [editingStatus, setEditingStatus] = useState<ReportStatus>('Submitted');
@@ -190,18 +202,30 @@ export const ReportsManagement: React.FC = () => {
 
       {/* Status & Assignment Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden space-y-5 p-6">
+        <div
+          className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200 cursor-pointer"
+          onClick={() => setSelectedReport(null)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden space-y-5 p-6 cursor-default"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-xs font-bold text-emerald-600 uppercase">Update Complaint</span>
                 <h4 className="font-black text-lg text-slate-900">{selectedReport.id}</h4>
               </div>
               <button
-                onClick={() => setSelectedReport(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedReport(null);
+                }}
+                className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                title="Close window (Esc)"
               >
-                <X className="w-5 h-5" />
+                <span>Close</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 

@@ -20,12 +20,13 @@ import {
   Archive,
   History,
   Flame,
-  Lock
+  Lock,
+  KeyRound
 } from 'lucide-react';
 import { PWAInstallButton } from '../common/PWAInstallButton';
 
 export type ActivePortal = 'public' | 'authority' | 'driver';
-export type PublicTab = 'home' | 'report' | 'track' | 'about';
+export type PublicTab = 'home' | 'report' | 'track' | 'about' | 'signin';
 export type AuthorityTab = 'dashboard' | 'dustbins' | 'reports' | 'alerts' | 'map' | 'route' | 'vehicles' | 'history';
 
 interface NavbarProps {
@@ -129,6 +130,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => {
                   setPortal('public');
+                  setPublicTab('report');
                   setMobileMenuOpen(false);
                 }}
                 className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all flex items-center gap-1 ${
@@ -214,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={() => setPublicTab('report')}
                   className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                    publicTab === 'report'
+                    publicTab === 'report' || publicTab === 'signin'
                       ? 'bg-emerald-600 text-white shadow-sm'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                   }`}
@@ -388,8 +390,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setPublicTab('report');
                   setMobileMenuOpen(false);
                 }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-emerald-400 hover:bg-slate-800"
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-bold text-emerald-400 hover:bg-slate-800 flex items-center gap-2"
               >
+                <FileText className="w-4 h-4" />
                 Report Dustbin
               </button>
               <button

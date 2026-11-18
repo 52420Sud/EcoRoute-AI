@@ -1,0 +1,10 @@
+Stop_Number,Location_Name,Bin_ID,Leg_Distance_km,Cumulative_km,Latitude,Longitude,Est_Fill_Level_Pct
+1,Brigade Road Corner,DB-004,1.49,1.49,12.9702,77.6083,85
+2,MG Road Metro Station,DB-002,0.63,2.12,12.9756,77.6066,94
+3,Commercial Street Hub,DB-005,0.75,2.87,12.9822,77.6081,79
+4,Indiranagar 100ft Road,DB-006,3.57,6.44,12.9784,77.6408,91
+5,Koramangala 5th Block,DB-007,5.12,11.56,12.9352,77.6245,96
+6,City Market Gate 1,DB-001,6.01,17.57,12.9634,77.5772,88
+7,Rajajinagar 1st Block,DB-012,4.0,21.57,12.9904,77.5528,82
+8,Majestic Bus Stand,DB-010,2.48,24.05,12.9772,77.5713,98
+9,Central Waste Depot,DEPOT-MAIN,2.6,26.65,12.9716,77.5946,0

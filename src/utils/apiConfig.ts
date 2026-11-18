@@ -13,8 +13,12 @@ export const getApiBaseUrl = (): string => {
       return 'http://localhost:5000/api';
     }
 
-    // For all browser sessions (PC localhost, Mobile Wi-Fi, or Production Cloud),
-    // relative '/api' works seamlessly via Vite proxy or Express backend
+    // When hosted on Vercel without custom env variable, route to Render cloud backend
+    if (window.location.hostname.includes('vercel.app')) {
+      return 'https://ecoroute-ai-v4jd.onrender.com/api';
+    }
+
+    // For all local/container sessions, relative '/api' works via proxy or same-origin
     return '/api';
   }
 

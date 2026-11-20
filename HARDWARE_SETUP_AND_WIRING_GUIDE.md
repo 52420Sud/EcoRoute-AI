@@ -28,16 +28,17 @@ Connect the components to your **ESP32 DevKit V1** as shown in your circuit diag
 | **HC-SR04 Sensor** | **VCC** | **VIN** | *None* | +5V Power from USB |
 | **HC-SR04 Sensor** | **GND** | **GND_R** | *None* | Common Ground rail |
 | **HC-SR04 Sensor** | **TRIG** | **GPIO 13 (IO13)** | *None* | Ultrasonic trigger burst signal |
-| **HC-SR04 Sensor** | **ECHO** | **GPIO 14 (IO14)** | **R2 (4.7kΩ) + R1 (3.3kΩ)** | Voltage divider steps down 5V echo pulse to safe 3.3V logic |
+| **HC-SR04 Sensor** | **ECHO** | **GPIO 14 (IO14)** | *Direct Connection* (or 1kΩ) | Ultrasonic echo return pulse |
 | **Piezo Buzzer (U3)**| **plus (+)** | **GPIO 4 (IO4)** | **R4 (100 Ω)** | Audible hazard buzzer for overflow alert (≥80% fill) |
 | **Piezo Buzzer (U3)**| **minus (-)** | **GND_R** | *None* | Ground connection |
 | **Status LED (D1)** | **Anode (+)** | **GPIO 27 (IO27)** | **R3 (130 Ω)** | Visual indicator for Wi-Fi, telemetry transmission & alerts |
 | **Status LED (D1)** | **Cathode (-)** | **GND_R** | *None* | Ground connection |
 
-> 💡 **Voltage Divider Note for ESP32:**  
-> The HC-SR04 sensor outputs a 5V logic pulse on its ECHO pin, while ESP32 GPIO inputs are 3.3V logic.  
-> - **If using 4.7kΩ and 3.3kΩ:** The divided voltage ($2.06\text{V}$) can sometimes sit right on the borderline of the ESP32 input HIGH threshold ($V_{IH} \approx 2.47\text{V}$).  
-> - **Quick Fix if readings are timing out / not detected:** Connect HC-SR04 **ECHO directly to GPIO 14** (or through a single $1\text{k}\Omega$ series resistor). In practice, ESP32 GPIOs have internal ESD clamping diodes that handle the low-current 5V pulse safely during testing.
+> ⚠️ **CRITICAL FIX - WHY THE SENSOR TIMES OUT (0 us reading):**  
+> If you used the $4.7\text{ k}\Omega$ and $3.3\text{ k}\Omega$ resistor divider:  
+> $$V_{in} = 5\text{V} \times \frac{3.3}{4.7 + 3.3} = 2.06\text{V}$$  
+> The ESP32's minimum digital HIGH threshold is $V_{IH} = 0.75 \times 3.3\text{V} = 2.475\text{V}$. Because $2.06\text{V} < 2.475\text{V}$, **GPIO 14 never detects the echo pulse**, causing `pulseIn` to time out and return `0`.  
+> **Solution:** Remove the two resistors and connect HC-SR04 **ECHO directly to GPIO 14**. The ESP32's internal protection diodes safely handle the microsecond pulse.
 
 ---
 

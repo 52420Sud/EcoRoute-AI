@@ -111,20 +111,17 @@ app.post('/api/sensors/telemetry', (req, res) => {
       return res.status(400).json({ error: 'dustbin_id is required' });
     }
 
-    // If calibrated container height exists for this dustbin, calculate against actual container depth
-    if (binCalibrations[dustbin_id] && distance_cm !== undefined) {
-      const calHeight = binCalibrations[dustbin_id];
-      const dist = Number(distance_cm);
-      const filledHeight = Math.max(0, calHeight - dist);
-      fill_level = Math.min(100, Math.max(0, Math.round((filledHeight / calHeight) * 100)));
-    } else if (fill_level === undefined && distance_cm !== undefined) {
-      // If ESP32 sends raw ultrasonic distance in cm, calculate percentage against 30cm container depth
-      const height = Number(bin_height_cm) || 30;
+    // 1. If client or ESP32 sends an explicit fill_level, respect and use it directly
+    if (fill_level !== undefined && fill_level !== null && !isNaN(Number(fill_level))) {
+      fill_level = Math.min(100, Math.max(0, Math.round(Number(fill_level))));
+    } else if (distance_cm !== undefined && distance_cm !== null && !isNaN(Number(distance_cm))) {
+      // 2. If ESP32 sends raw ultrasonic distance in cm, calculate against container depth (safeguard min 20cm)
+      const height = Math.max(20, Number(binCalibrations[dustbin_id]) || Number(bin_height_cm) || 30.0);
       const dist = Number(distance_cm);
       const filledHeight = Math.max(0, height - dist);
       fill_level = Math.min(100, Math.max(0, Math.round((filledHeight / height) * 100)));
     } else {
-      fill_level = Math.min(100, Math.max(0, Math.round(Number(fill_level) || 0)));
+      fill_level = 0;
     }
 
     // Determine Status: Critical >= 80%, Nearly Full >= 50%
@@ -232,12 +229,17 @@ app.post('/api/sensors/calibrate', (req, res) => {
     // If no explicit height passed, automatically read the real measured depth from the sensor
     if (!calHeight || isNaN(calHeight) || calHeight <= 0) {
       // Find the most recent valid distance ping from telemetry log
-      const recent = db.prepare('SELECT distance_cm FROM sensor_telemetry WHERE dustbin_id = ? AND distance_cm IS NOT NULL AND distance_cm > 0 ORDER BY id DESC LIMIT 1').get(dustbin_id);
+      const recent = db.prepare('SELECT distance_cm FROM sensor_telemetry WHERE dustbin_id = ? AND distance_cm IS NOT NULL AND distance_cm >= 15 ORDER BY id DESC LIMIT 1').get(dustbin_id);
       if (recent && recent.distance_cm) {
         calHeight = Number(Number(recent.distance_cm).toFixed(1));
       } else {
-        calHeight = 30.0; // 30cm standard container depth fallback if no pings received yet
+        calHeight = 30.0; // 30cm standard container depth fallback
       }
+    }
+
+    // Ensure bin depth is within realistic range (15cm to 200cm)
+    if (calHeight < 15.0 || calHeight > 200.0) {
+      calHeight = 30.0;
     }
 
     binCalibrations[dustbin_id] = calHeight;

@@ -33,9 +33,10 @@ const char* SERVER_URL    = "https://ecoroute-ai-v4jd.onrender.com/api/sensors/t
 // =============================================================================
 const char* DUSTBIN_ID    = "DB-003"; 
 
-// Container Depth: measure from the sensor down to the bottom of the empty bin.
-// Default: 30.0 cm. (When empty/nothing inside = 0% full; when full = 80-100% full)
-float binHeightCm         = 30.0f; 
+// YOUR PHYSICAL DUSTBIN DEPTH:
+// Your sensor measured 23 cm to the bottom of the empty dustbin!
+// When empty = 23 cm (0% full). When waste/phone is added, distance gets smaller.
+float binHeightCm         = 23.0f; 
 
 const int TRIG_PIN   = 13; // HC-SR04 TRIG (GPIO 13)
 const int ECHO_PIN   = 14; // HC-SR04 ECHO (GPIO 14 - Direct wire)
@@ -54,7 +55,6 @@ float singlePingCm() {
   delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
 
-  // 35ms timeout (~6 meters)
   unsigned long duration = pulseIn(ECHO_PIN, HIGH, 35000);
   if (duration == 0) return -1.0f; // No echo received
   return (duration * 0.0343f) / 2.0f;
@@ -77,7 +77,7 @@ float measureDistanceCm() {
     return readings[2];
   }
   if (count >= 1) return readings[0];
-  return -1.0f; // Timeout / No reflection
+  return -1.0f;
 }
 
 void sendTelemetry() {
@@ -90,19 +90,25 @@ void sendTelemetry() {
   float distanceCm = measureDistanceCm();
   int fillLevelPercent = 0;
 
-  // KEY LOGIC FIX:
-  // If no object is detected (echo timeout) OR measured distance >= bin height,
-  // that means the bin is EMPTY (phone/trash was removed)!
-  if (distanceCm < 0 || distanceCm >= binHeightCm) {
-    distanceCm = binHeightCm; // Sets to 30.0 cm
-    fillLevelPercent = 0;     // Correctly reports 0% (Empty)
+  // =========================================================================
+  // LOGIC FIX:
+  // Your bin is 23 cm tall.
+  // 1. If distance is close to the bottom (within 1.5 cm of 23 cm) or timeout:
+  //    The bin is completely EMPTY -> ALWAYS report 0%!
+  // 2. If distance is smaller (e.g. 5 to 15 cm):
+  //    An object/phone is inside -> calculate exact fill percentage!
+  // =========================================================================
+  if (distanceCm < 0 || distanceCm >= (binHeightCm - 1.5f)) {
+    // Bin is empty!
+    distanceCm = binHeightCm; // Sets to 23.0 cm
+    fillLevelPercent = 0;     // 0% Empty!
 
     Serial.println("\n----------------------------------------------");
-    Serial.println("[Sensor] 🗑️ Bin is EMPTY (Phone/Trash Removed)!");
-    Serial.print("[Sensor] Distance to Surface: "); Serial.print(distanceCm, 1); Serial.println(" cm");
-    Serial.println("[Calculated] Fill Level:      0% (Empty)");
+    Serial.println("[Sensor] 🗑️ Dustbin is EMPTY (0% Full)");
+    Serial.print("[Sensor] Distance to Bottom: "); Serial.print(distanceCm, 1); Serial.println(" cm");
+    Serial.println("[Calculated] Fill Level:     0%");
   } else {
-    // An object (phone, trash, hand) is inside the container!
+    // Phone or waste is inside the bin
     float filledHeight = binHeightCm - distanceCm;
     if (filledHeight < 0.0f) filledHeight = 0.0f;
     if (filledHeight > binHeightCm) filledHeight = binHeightCm;
@@ -110,13 +116,13 @@ void sendTelemetry() {
     fillLevelPercent = (int)round((filledHeight / binHeightCm) * 100.0f);
 
     Serial.println("\n----------------------------------------------");
-    Serial.print("[Sensor] 📦 Waste/Phone Detected at: "); Serial.print(distanceCm, 1); Serial.println(" cm");
-    Serial.print("[Calculated] Fill Level:            "); Serial.print(fillLevelPercent); Serial.println("%");
+    Serial.print("[Sensor] 📦 Waste/Phone Inside Bin! Distance: "); Serial.print(distanceCm, 1); Serial.println(" cm");
+    Serial.print("[Calculated] Fill Level:                    "); Serial.print(fillLevelPercent); Serial.println("%");
   }
 
   // Local Buzzer & LED Alert if Critical (>= 80%)
   if (fillLevelPercent >= 80) {
-    Serial.println("[ALERT] ⚠️ Critical Overflow! Buzzer Alert Active!");
+    Serial.println("[ALERT] ⚠️ Critical Overflow! Buzzer Beeping!");
     for (int i = 0; i < 3; i++) {
       digitalWrite(BUZZER_PIN, HIGH);
       digitalWrite(LED_PIN, HIGH);
@@ -127,7 +133,7 @@ void sendTelemetry() {
     }
     digitalWrite(LED_PIN, HIGH);
   } else {
-    digitalWrite(LED_PIN, HIGH); // Steady ON when normal & connected
+    digitalWrite(LED_PIN, HIGH);
   }
   digitalWrite(BUZZER_PIN, LOW);
 
@@ -140,12 +146,12 @@ void sendTelemetry() {
   jsonPayload += "\"battery_pct\":95";
   jsonPayload += "}";
 
-  Serial.print("[Cloud POST Payload]: ");
+  Serial.print("[Cloud POST]: ");
   Serial.println(jsonPayload);
 
-  // Transmit over Secure HTTPS to Render Cloud Backend
+  // Send over Secure HTTPS to Render Cloud
   WiFiClientSecure secureClient;
-  secureClient.setInsecure(); // Connects over SSL without needing local root certificates
+  secureClient.setInsecure();
 
   HTTPClient http;
   http.setTimeout(4500);
@@ -157,10 +163,10 @@ void sendTelemetry() {
     if (httpResponseCode > 0) {
       Serial.print("[HTTP Success] Code: ");
       Serial.print(httpResponseCode);
-      Serial.print(" | Server Response: ");
+      Serial.print(" | Server: ");
       Serial.println(http.getString());
 
-      // Blink LED briefly to confirm cloud transmission
+      // Blink LED to confirm transmission
       digitalWrite(LED_PIN, LOW);
       delay(60);
       digitalWrite(LED_PIN, HIGH);
@@ -188,9 +194,33 @@ void setup() {
 
   Serial.println("\n=======================================================");
   Serial.println("  EcoRoute AI - ESP32 Smart Waste IoT Sensor Starting  ");
-  Serial.println("  Pins: TRIG=13, ECHO=14, BUZZER=4, LED=27             ");
-  Serial.println("  Target: Render Cloud (Synced to Vercel Frontend)     ");
   Serial.println("=======================================================");
+
+  // Auto-Detect Empty Bin Depth on Startup:
+  // If the bin is empty when powered on, it accurately locks the baseline!
+  Serial.println("[Auto-Detect] Measuring empty bin depth...");
+  float detectedDist = 0;
+  int goodSamples = 0;
+  for (int i = 0; i < 5; i++) {
+    float d = singlePingCm();
+    if (d >= 10.0f && d <= 100.0f) {
+      detectedDist += d;
+      goodSamples++;
+    }
+    delay(100);
+  }
+
+  if (goodSamples >= 3) {
+    binHeightCm = detectedDist / goodSamples;
+    Serial.print("[Auto-Detect] ✅ Empty Bin Depth detected as: ");
+    Serial.print(binHeightCm, 1);
+    Serial.println(" cm");
+  } else {
+    binHeightCm = 23.0f; // Default to your 23 cm dustbin
+    Serial.print("[Auto-Detect] Using calibrated depth: ");
+    Serial.print(binHeightCm, 1);
+    Serial.println(" cm");
+  }
 
   WiFi.mode(WIFI_STA);
   WiFi.setAutoReconnect(true);
@@ -214,11 +244,9 @@ void setup() {
     Serial.println("\n[WiFi] ✅ Connected Successfully!");
     Serial.print("[WiFi] IP: ");
     Serial.println(WiFi.localIP());
-    Serial.print("[Cloud Server]: ");
-    Serial.println(SERVER_URL);
   } else {
     digitalWrite(LED_PIN, LOW);
-    Serial.println("\n[WiFi] ⚠️ Connection timed out. ESP32 will auto-retry in loop.");
+    Serial.println("\n[WiFi] ⚠️ Wi-Fi timed out. Will auto-retry.");
   }
 }
 

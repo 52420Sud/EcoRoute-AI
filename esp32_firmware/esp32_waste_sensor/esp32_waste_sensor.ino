@@ -1,186 +1,74 @@
 /*
   =============================================================================
   AI-Based Smart Waste Management System - ESP32 IoT Node Firmware (Production)
-  Compatible with: ESP32 DevKit V1 (DOIT) + HC-SR04 Ultrasonic Sensor + Buzzer + LED
+  Target: Live Render Backend (Updates your Vercel Dashboard in Real-Time!)
   =============================================================================
-  Circuit Connections (Exact Match to Schematic):
-    1. ESP32 VIN       -> HC-SR04 VCC (5V Power)
-    2. ESP32 GND_R     -> Common Ground Rail (HC-SR04 GND, Buzzer -, LED Cathode, R1)
-    3. ESP32 IO13      -> HC-SR04 TRIG (GPIO 13)
-    4. ESP32 IO14      -> HC-SR04 ECHO (GPIO 14 via Voltage Divider: R2 4.7k + R1 3.3k)
-    5. ESP32 IO4       -> Piezo Buzzer + (GPIO 4 via R4 100 Ohm resistor)
-    6. ESP32 IO27      -> Status LED Anode (GPIO 27 via R3 130 Ohm resistor)
+  Hardware Connections:
+    1. ESP32 VIN   -> HC-SR04 VCC (5V Power from USB)
+    2. ESP32 GND   -> HC-SR04 GND, Buzzer -, LED Cathode
+    3. ESP32 IO13  -> HC-SR04 TRIG (GPIO 13)
+    4. ESP32 IO14  -> HC-SR04 ECHO (GPIO 14 - Direct wire, NO resistors)
+    5. ESP32 IO4   -> Piezo Buzzer + (GPIO 4 via 100 Ohm)
+    6. ESP32 IO27  -> Status LED Anode (GPIO 27 via 130 Ohm)
   =============================================================================
 */
 
 #include <WiFi.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 
 // =============================================================================
 // --- 1. Wi-Fi Configuration ---
-// Connect your ESP32 to the same Wi-Fi network as the laptop/server
 // =============================================================================
-const char* WIFI_SSID     = "SUDARSHAN 9159";      // <-- Put your Wi-Fi SSID here
-const char* WIFI_PASSWORD = "2235mE1^";  // <-- Put your Wi-Fi password here
+const char* WIFI_SSID     = "SUDARSHAN 9159";      
+const char* WIFI_PASSWORD = "2235mE1^";            
 
 // =============================================================================
-// --- 2. Backend Server Endpoint ---
-// Laptop IP on current Wi-Fi network: 10.255.74.76
+// --- 2. Target Server (Live Render Cloud - Connected to Vercel!) ---
 // =============================================================================
-const char* SERVER_URL    = "http://10.255.74.76:5000/api/sensors/telemetry";
+const char* SERVER_URL    = "https://ecoroute-ai-v4jd.onrender.com/api/sensors/telemetry";
 
 // =============================================================================
 // --- 3. Hardware & Dustbin Parameters ---
 // =============================================================================
-const char* DUSTBIN_ID        = "DB-003"; // Assigned Dustbin ID
+const char* DUSTBIN_ID    = "DB-003"; 
 
-// Calibration settings:
-// Default to fixed 30.0 cm depth. If you want automatic calibration at boot, set to true.
-const bool AUTO_CALIBRATE_ON_BOOT = false;
-float binHeightCm                 = 30.0f; // Standard container depth in cm (30 cm = 0% full, 5 cm = 83% full)
+// Container Depth: measure from the sensor down to the bottom of the empty bin.
+// Default: 30.0 cm. (When empty/nothing inside = 0% full; when full = 80-100% full)
+float binHeightCm         = 30.0f; 
 
-// Exact Pin Definitions from Circuit Schematic:
-const int TRIG_PIN   = 13; // HC-SR04 Trigger (ESP32 IO13)
-const int ECHO_PIN   = 14; // HC-SR04 Echo (ESP32 IO14 via R2 4.7k / R1 3.3k divider)
-const int BUZZER_PIN = 4;  // Piezo Buzzer (ESP32 IO4 via R4 100 ohm)
-const int LED_PIN    = 27; // External Status LED (ESP32 IO27 via R3 130 ohm)
+const int TRIG_PIN   = 13; // HC-SR04 TRIG (GPIO 13)
+const int ECHO_PIN   = 14; // HC-SR04 ECHO (GPIO 14 - Direct wire)
+const int BUZZER_PIN = 4;  // Piezo Buzzer (GPIO 4)
+const int LED_PIN    = 27; // Status LED (GPIO 27)
 
-// Telemetry transmit interval (5000 ms = every 5 seconds)
-const unsigned long SEND_INTERVAL_MS = 5000;
+// Telemetry interval (transmit every 4 seconds)
+const unsigned long SEND_INTERVAL_MS = 4000; 
 unsigned long lastSendTime = 0;
 
-// Forward function declarations
-float singlePingCm();
-float measureDistanceCm();
-void sendTelemetry();
-
-void setup() {
-  Serial.begin(115200);
-  delay(1000);
-
-  // Initialize Pin Modes
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUZZER_PIN, OUTPUT);
-
-  // Default Pin States
-  digitalWrite(TRIG_PIN, LOW);
-  digitalWrite(LED_PIN, LOW);
-  digitalWrite(BUZZER_PIN, LOW);
-
-  Serial.println("\n==============================================");
-  Serial.println("  ESP32 Smart Waste IoT Sensor Starting...    ");
-  Serial.println("  Schematic: TRIG=13, ECHO=14, BUZZER=4, LED=27");
-  Serial.println("==============================================");
-
-  // Set Wi-Fi to Station Mode & Enable Auto-Reconnect
-  WiFi.mode(WIFI_STA);
-  WiFi.setAutoReconnect(true);
-
-  // Connect to Wi-Fi with a 20-second timeout to prevent watchdog freeze
-  Serial.print("Connecting to Wi-Fi: ");
-  Serial.println(WIFI_SSID);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
-  int attempts = 0;
-  bool ledToggle = false;
-  while (WiFi.status() != WL_CONNECTED && attempts < 40) {
-    ledToggle = !ledToggle;
-    digitalWrite(LED_PIN, ledToggle ? HIGH : LOW); // Blink status LED during search
-    delay(500);
-    Serial.print(".");
-    attempts++;
-  }
-
-  if (WiFi.status() == WL_CONNECTED) {
-    digitalWrite(LED_PIN, HIGH); // Solid LED indicates Wi-Fi connected
-    Serial.println("\n[WiFi] Connected Successfully!");
-    Serial.print("[WiFi] ESP32 IP Address: ");
-    Serial.println(WiFi.localIP());
-    Serial.print("[Server] Target URL: ");
-    Serial.println(SERVER_URL);
-  } else {
-    digitalWrite(LED_PIN, LOW);
-    Serial.println("\n[WiFi] ⚠️ Wi-Fi connection timed out!");
-    Serial.println("[WiFi] Check SSID/Password. ESP32 will auto-retry in background.");
-  }
-
-  // Auto-Calibrate Empty Container Depth (if enabled)
-  if (AUTO_CALIBRATE_ON_BOOT) {
-    Serial.println("\n----------------------------------------------");
-    Serial.println("[Auto-Calibration] Sampling empty container depth in 2 seconds...");
-    Serial.println("[Auto-Calibration] Ensure container is EMPTY under the sensor!");
-    delay(2000);
-
-    float totalDist = 0;
-    int validReadings = 0;
-    for (int i = 0; i < 5; i++) {
-      float d = measureDistanceCm();
-      if (d > 5.0f && d < 400.0f) {
-        totalDist += d;
-        validReadings++;
-      }
-      delay(200);
-    }
-
-    if (validReadings >= 3) {
-      binHeightCm = totalDist / validReadings;
-      Serial.print("[Auto-Calibration] ✅ Calibrated Empty Depth: ");
-      Serial.print(binHeightCm, 1);
-      Serial.println(" cm");
-      Serial.println("[Auto-Calibration] Empty container will accurately report 0% full!");
-    } else {
-      Serial.print("[Auto-Calibration] ⚠️ Surface reflection weak. Using fallback depth: ");
-      Serial.print(binHeightCm, 1);
-      Serial.println(" cm");
-    }
-    Serial.println("----------------------------------------------\n");
-  }
-
-  // Ensure minimum depth to prevent division-by-zero
-  if (binHeightCm < 5.0f) {
-    binHeightCm = 30.0f;
-  }
-}
-
-// Single ultrasonic ping measurement
+// Single ultrasonic pulse measurement
 float singlePingCm() {
-  // Ensure trigger pin is low
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(4);
-
-  // Send 10-microsecond trigger pulse
   digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
 
-  // Read echo time in microseconds (35ms timeout = ~6 meters maximum)
+  // 35ms timeout (~6 meters)
   unsigned long duration = pulseIn(ECHO_PIN, HIGH, 35000);
-
-  if (duration == 0) {
-    return -1.0f; // Timed out (no pulse received)
-  }
-
-  // Distance = (duration * speed of sound 0.0343 cm/us) / 2
+  if (duration == 0) return -1.0f; // No echo received
   return (duration * 0.0343f) / 2.0f;
 }
 
-// 3-sample median filter for stable distance reading (with single-ping fallback)
+// Multi-sample filter for steady readings
 float measureDistanceCm() {
   float readings[3];
   int count = 0;
-
   for (int i = 0; i < 3; i++) {
     float d = singlePingCm();
-    if (d >= 2.0f && d <= 450.0f) {
-      readings[count++] = d;
-    }
-    delay(30); // Wait between pings so ultrasonic echoes fully attenuate
+    if (d >= 2.0f && d <= 450.0f) readings[count++] = d;
+    delay(25);
   }
-
-  // If median samples succeeded, calculate clean median
   if (count == 3) {
     if ((readings[0] <= readings[1] && readings[1] <= readings[2]) ||
         (readings[2] <= readings[1] && readings[1] <= readings[0])) return readings[1];
@@ -188,55 +76,47 @@ float measureDistanceCm() {
         (readings[2] <= readings[0] && readings[0] <= readings[1])) return readings[0];
     return readings[2];
   }
-  if (count == 2) return (readings[0] + readings[1]) / 2.0f;
-  if (count == 1) return readings[0];
-
-  // Fallback: one direct attempt
-  return singlePingCm();
+  if (count >= 1) return readings[0];
+  return -1.0f; // Timeout / No reflection
 }
 
 void sendTelemetry() {
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("[WiFi] Not connected. Attempting reconnection...");
+    Serial.println("[WiFi] ⚠️ Disconnected. Reconnecting to Wi-Fi...");
     WiFi.reconnect();
     return;
   }
 
   float distanceCm = measureDistanceCm();
+  int fillLevelPercent = 0;
 
-  if (distanceCm < 0) {
-    Serial.println("\n[Sensor] ⚠️ HC-SR04 Echo Timeout (No distance reading)!");
-    Serial.println("  1. Verify HC-SR04 VCC is connected to VIN (5V), NOT 3.3V.");
-    Serial.println("  2. Check if TRIG (GPIO 13) and ECHO (GPIO 14) are swapped.");
-    Serial.println("  3. If using resistors on ECHO: try connecting ECHO directly to GPIO 14.");
-    Serial.println("  4. Ensure sensor GND is connected to ESP32 GND.");
-    return;
+  // KEY LOGIC FIX:
+  // If no object is detected (echo timeout) OR measured distance >= bin height,
+  // that means the bin is EMPTY (phone/trash was removed)!
+  if (distanceCm < 0 || distanceCm >= binHeightCm) {
+    distanceCm = binHeightCm; // Sets to 30.0 cm
+    fillLevelPercent = 0;     // Correctly reports 0% (Empty)
+
+    Serial.println("\n----------------------------------------------");
+    Serial.println("[Sensor] 🗑️ Bin is EMPTY (Phone/Trash Removed)!");
+    Serial.print("[Sensor] Distance to Surface: "); Serial.print(distanceCm, 1); Serial.println(" cm");
+    Serial.println("[Calculated] Fill Level:      0% (Empty)");
+  } else {
+    // An object (phone, trash, hand) is inside the container!
+    float filledHeight = binHeightCm - distanceCm;
+    if (filledHeight < 0.0f) filledHeight = 0.0f;
+    if (filledHeight > binHeightCm) filledHeight = binHeightCm;
+
+    fillLevelPercent = (int)round((filledHeight / binHeightCm) * 100.0f);
+
+    Serial.println("\n----------------------------------------------");
+    Serial.print("[Sensor] 📦 Waste/Phone Detected at: "); Serial.print(distanceCm, 1); Serial.println(" cm");
+    Serial.print("[Calculated] Fill Level:            "); Serial.print(fillLevelPercent); Serial.println("%");
   }
 
-  // Calculate fill percentage based on container depth
-  // As waste accumulates, distance to the ultrasonic sensor decreases
-  if (binHeightCm < 5.0f) binHeightCm = 30.0f; // Division-by-zero safeguard
-
-  float filledHeight = binHeightCm - distanceCm;
-  if (filledHeight < 0.0f) filledHeight = 0.0f;
-  if (filledHeight > binHeightCm) filledHeight = binHeightCm;
-
-  int fillLevelPercent = (int)round((filledHeight / binHeightCm) * 100.0f);
-
-  Serial.println("\n----------------------------------------------");
-  Serial.print("[Sensor] Distance to Surface: ");
-  Serial.print(distanceCm, 1);
-  Serial.println(" cm");
-  Serial.print("[Sensor] Calibrated Depth:    ");
-  Serial.print(binHeightCm, 1);
-  Serial.println(" cm");
-  Serial.print("[Calculated] Fill Level:      ");
-  Serial.print(fillLevelPercent);
-  Serial.println("%");
-
-  // Actuate Local Alerts (Buzzer & LED) based on Fill Threshold (>= 80% Critical)
+  // Local Buzzer & LED Alert if Critical (>= 80%)
   if (fillLevelPercent >= 80) {
-    Serial.println("[ALERT] ⚠️ Critical Overflow (>=80%)! Sounding Buzzer!");
+    Serial.println("[ALERT] ⚠️ Critical Overflow! Buzzer Alert Active!");
     for (int i = 0; i < 3; i++) {
       digitalWrite(BUZZER_PIN, HIGH);
       digitalWrite(LED_PIN, HIGH);
@@ -245,9 +125,11 @@ void sendTelemetry() {
       digitalWrite(LED_PIN, LOW);
       delay(80);
     }
-    digitalWrite(LED_PIN, HIGH); // Keep warning LED illuminated
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(LED_PIN, HIGH); // Steady ON when normal & connected
   }
-  digitalWrite(BUZZER_PIN, LOW); // Explicitly ensure buzzer is off
+  digitalWrite(BUZZER_PIN, LOW);
 
   // Construct JSON Payload
   String jsonPayload = "{";
@@ -258,44 +140,90 @@ void sendTelemetry() {
   jsonPayload += "\"battery_pct\":95";
   jsonPayload += "}";
 
-  Serial.print("[HTTP POST] Payload: ");
+  Serial.print("[Cloud POST Payload]: ");
   Serial.println(jsonPayload);
 
-  // Send HTTP POST Request
-  WiFiClient client;
-  HTTPClient http;
-  http.setTimeout(4000); // 4-second timeout prevents loop locking if server unreachable
+  // Transmit over Secure HTTPS to Render Cloud Backend
+  WiFiClientSecure secureClient;
+  secureClient.setInsecure(); // Connects over SSL without needing local root certificates
 
-  if (http.begin(client, SERVER_URL)) {
+  HTTPClient http;
+  http.setTimeout(4500);
+
+  if (http.begin(secureClient, SERVER_URL)) {
     http.addHeader("Content-Type", "application/json");
     int httpResponseCode = http.POST(jsonPayload);
 
     if (httpResponseCode > 0) {
-      String response = http.getString();
-      Serial.print("[HTTP] Success Code: ");
-      Serial.println(httpResponseCode);
-      Serial.print("[Server Response]: ");
-      Serial.println(response);
+      Serial.print("[HTTP Success] Code: ");
+      Serial.print(httpResponseCode);
+      Serial.print(" | Server Response: ");
+      Serial.println(http.getString());
 
-      // Brief LED blink to indicate transmission success
+      // Blink LED briefly to confirm cloud transmission
       digitalWrite(LED_PIN, LOW);
-      delay(80);
+      delay(60);
       digitalWrite(LED_PIN, HIGH);
     } else {
-      Serial.print("[HTTP] Error sending POST: ");
+      Serial.print("[HTTP Error]: ");
       Serial.println(httpResponseCode);
       Serial.println(http.errorToString(httpResponseCode).c_str());
     }
     http.end();
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+
+  digitalWrite(TRIG_PIN, LOW);
+  digitalWrite(LED_PIN, LOW);
+  digitalWrite(BUZZER_PIN, LOW);
+
+  Serial.println("\n=======================================================");
+  Serial.println("  EcoRoute AI - ESP32 Smart Waste IoT Sensor Starting  ");
+  Serial.println("  Pins: TRIG=13, ECHO=14, BUZZER=4, LED=27             ");
+  Serial.println("  Target: Render Cloud (Synced to Vercel Frontend)     ");
+  Serial.println("=======================================================");
+
+  WiFi.mode(WIFI_STA);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  Serial.print("[WiFi] Connecting to ");
+  Serial.println(WIFI_SSID);
+
+  int attempts = 0;
+  bool toggle = false;
+  while (WiFi.status() != WL_CONNECTED && attempts < 40) {
+    toggle = !toggle;
+    digitalWrite(LED_PIN, toggle ? HIGH : LOW);
+    delay(500);
+    Serial.print(".");
+    attempts++;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("\n[WiFi] ✅ Connected Successfully!");
+    Serial.print("[WiFi] IP: ");
+    Serial.println(WiFi.localIP());
+    Serial.print("[Cloud Server]: ");
+    Serial.println(SERVER_URL);
   } else {
-    Serial.println("[HTTP] Error: Unable to begin connection to server.");
+    digitalWrite(LED_PIN, LOW);
+    Serial.println("\n[WiFi] ⚠️ Connection timed out. ESP32 will auto-retry in loop.");
   }
 }
 
 void loop() {
   unsigned long currentMillis = millis();
-
-  // Transmit telemetry periodically
   if (currentMillis - lastSendTime >= SEND_INTERVAL_MS) {
     lastSendTime = currentMillis;
     sendTelemetry();
